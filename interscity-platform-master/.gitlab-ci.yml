@@ -1,0 +1,223 @@
+image: ruby:2.7
+
+services:
+  - mongo:latest
+  - redis:latest
+  - postgres:latest
+
+variables:
+  MONGO_USER: admin
+  MONGO_PASSWORD: admin
+  MONGO_HOST: mongo
+  MONGO_PORT: "27017"
+  POSTGRES_DB: resource_test
+  POSTGRES_USER: resource_test
+  POSTGRES_PASSWORD: resource_test
+  RAILS_ENV: test
+
+# The following variables are defined within Gitlab configurations as secrets:
+#
+# * DEPLOY_KEY
+
+stages:
+  - lint
+  - test
+  - integration_test
+  - build
+  - deploy
+  - post_deploy_integration_test
+
+before_script:
+  - gem install bundler --no-document
+
+rubocop:
+  stage: lint
+  services: []
+  before_script:
+    - gem install rubocop:0.74.0 rubocop-rails:2.3.1 --no-doc
+  script:
+    - pushd src
+    - rubocop
+
+actuator-controller:
+  stage: test
+  script:
+    - pushd src/actuator-controller
+    - cp config/mongoid-ci.yml config/mongoid.yml
+    - bundle check || bundle install
+    - bundle exec rails spec
+
+data-collector:
+  stage: test
+  script:
+    - pushd src/data-collector
+    - cp config/mongoid-ci.yml config/mongoid.yml
+    - bundle check || bundle install
+    - bundle exec rails spec
+
+resource-adaptor:
+  stage: test
+  script:
+    - pushd src/resource-adaptor
+    - cp config/database-ci.yml config/database.yml
+    - bundle check || bundle install
+    - bundle exec rake db:create
+    - bundle exec rake db:migrate
+    - bundle exec rails spec
+
+resource-cataloguer:
+  stage: test
+  script:
+    - pushd src/resource-cataloguer
+    - cp config/database-ci.yml config/database.yml
+    - bundle check || bundle install
+    - bundle exec rake db:create
+    - bundle exec rake db:migrate
+    - bundle exec rails spec
+
+resource-discoverer:
+  stage: test
+  script:
+    - pushd src/resource-discoverer
+    - bundle check || bundle install
+    - bundle exec rails spec
+
+actuator-controller-integration:
+  stage: integration_test
+  script:
+    - pushd src/actuator-controller
+    - cp config/mongoid-ci.yml config/mongoid.yml
+    - bundle check || bundle install
+    - bundle exec rails spec:integration
+
+data-collector-integration:
+  stage: integration_test
+  script:
+    - pushd src/data-collector
+    - cp config/mongoid-ci.yml config/mongoid.yml
+    - bundle check || bundle install
+    - bundle exec rails spec:integration
+
+resource-adaptor-integration:
+  stage: integration_test
+  script:
+    - pushd src/resource-adaptor
+    - cp config/database-ci.yml config/database.yml
+    - bundle check || bundle install
+    - bundle exec rake db:create
+    - bundle exec rake db:migrate
+    - bundle exec rails spec:integration
+
+resource-cataloguer-integration:
+  stage: integration_test
+  script:
+    - pushd src/resource-cataloguer
+    - cp config/database-ci.yml config/database.yml
+    - bundle check || bundle install
+    - bundle exec rake db:create
+    - bundle exec rake db:migrate
+    - bundle exec rails spec:integration
+
+resource-discoverer-integration:
+  stage: integration_test
+  script:
+    - pushd src/resource-discoverer
+    - bundle check || bundle install
+    - bundle exec rails spec:integration
+
+build_and_push_docker:
+  stage: build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+  image: docker:stable
+  only:
+    - master
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - cd src
+    # base
+    - docker build --pull -t $CI_REGISTRY/interscity/interscity-platform/interscity-platform/base .
+    - docker push $CI_REGISTRY/interscity/interscity-platform/interscity-platform/base
+    - docker pull registry.gitlab.com/interscity/interscity-platform/interscity-platform/base:latest
+    # actuator-controller
+    - cd actuator-controller
+    - docker build --pull -t $CI_REGISTRY/interscity/interscity-platform/interscity-platform/actuator-controller .
+    - docker push $CI_REGISTRY/interscity/interscity-platform/interscity-platform/actuator-controller
+    - cd ..
+    # data-collector
+    - cd data-collector
+    - docker build --pull -t $CI_REGISTRY/interscity/interscity-platform/interscity-platform/data-collector .
+    - docker push $CI_REGISTRY/interscity/interscity-platform/interscity-platform/data-collector
+    - cd ..
+    # resource-adaptor
+    - cd resource-adaptor
+    - docker build --pull -t $CI_REGISTRY/interscity/interscity-platform/interscity-platform/resource-adaptor .
+    - docker push $CI_REGISTRY/interscity/interscity-platform/interscity-platform/resource-adaptor
+    - cd ..
+    # resource-cataloguer
+    - cd resource-cataloguer
+    - docker build --pull -t $CI_REGISTRY/interscity/interscity-platform/interscity-platform/resource-cataloguer .
+    - docker push $CI_REGISTRY/interscity/interscity-platform/interscity-platform/resource-cataloguer
+    - cd ..
+    # resource-discoverer
+    - cd resource-discoverer
+    - docker build --pull -t $CI_REGISTRY/interscity/interscity-platform/interscity-platform/resource-discoverer .
+    - docker push $CI_REGISTRY/interscity/interscity-platform/interscity-platform/resource-discoverer
+    - cd ..
+    # kong-api-gateway
+    - cd kong-api-gateway
+    - docker build --pull -t $CI_REGISTRY/interscity/interscity-platform/interscity-platform/kong-api-gateway .
+    - docker push $CI_REGISTRY/interscity/interscity-platform/interscity-platform/kong-api-gateway
+    - cd ..
+
+deploy_dry_run:
+  stage: test
+  image: python
+  services: []
+  before_script:
+    - echo 'deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main' > /etc/apt/sources.list.d/ansible.list
+    - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+    - apt-get update -y
+    - apt-get install -y ansible
+    - echo $DEPLOY_KEY | base64 -d > deploy_key # encoded with `base64 deploy_key | tr -d '\n'`
+    - echo $VAULT_PASS > deploy/ansible/.vault-pass.txt
+    - "sed -i 's/enabled_db_backups: false/enabled_db_backups: true/g' deploy/ansible/group_vars/all"
+    - chmod 600 deploy_key
+  script:
+    - pushd deploy/ansible
+    - ansible-playbook deploy-swarm-stack.yml -C -i revoada_test_hosts -u deployer --private-key ../../deploy_key --ssh-extra-args "-o StrictHostKeyChecking=no"
+
+deploy:
+  stage: deploy
+  image: python
+  only:
+    - master
+  services: []
+  before_script:
+    - echo 'deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main' > /etc/apt/sources.list.d/ansible.list
+    - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+    - apt-get update -y
+    - apt-get install -y ansible
+    - echo $DEPLOY_KEY | base64 -d > deploy_key # encoded with `base64 deploy_key | tr -d '\n'`
+    - echo $VAULT_PASS > deploy/ansible/.vault-pass.txt
+    - "sed -i 's/enabled_db_backups: false/enabled_db_backups: true/g' deploy/ansible/group_vars/all"
+    - chmod 600 deploy_key
+  script:
+    - pushd deploy/ansible
+    - ansible-playbook deploy-swarm-stack.yml -i revoada_test_hosts -u deployer --private-key ../../deploy_key --ssh-extra-args "-o StrictHostKeyChecking=no"
+
+post_deploy_integration_test:
+  stage: post_deploy_integration_test
+  image: ruby:2.7
+  only:
+    - master
+  before_script:
+    - pushd src/test
+    - bundle check || bundle install
+    - sleep 60
+  script:
+    - ISCITY_URL="http://api.playground.interscity.org" rspec

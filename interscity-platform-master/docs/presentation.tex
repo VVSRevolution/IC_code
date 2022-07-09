@@ -1,0 +1,148 @@
+\documentclass{beamer}
+\usepackage[T1]{fontenc}
+\usepackage{fourier}
+
+\usepackage[english]{babel}
+\usepackage{url}
+\usepackage{graphbox}
+
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{footline}{%
+  \hspace{.5em}
+  \includegraphics[align=c, height=3em]{pc_h_preto}%
+  \hfill%
+  InterSCity Platform - Technical Advice%
+  \hfill%
+  \usebeamercolor[fg]{page number in head/foot}%
+  \usebeamerfont{page number in head/foot}%
+  \insertframenumber\,/\,\inserttotalframenumber\kern1em%
+  \vspace{.25em}
+}
+
+
+\begin{document}
+
+  \begin{frame}
+    \frametitle{Technical Advice - InterSCity Platform}
+
+    \begin{center}
+      Download the full report at:
+
+      \vspace{1em}
+
+      \includegraphics[width=.45\textwidth]{qrcode}
+
+      \vspace{.5em}
+
+      {\tiny \url{https://gitlab.com/pragmacode/interscity-platform/wikis/uploads/43c95846f55897d6a91db8185c8878fd/report.pdf}}
+    \end{center}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Objectives}
+
+    \begin{itemize}
+      \item reliability;
+      \item easy of install;
+      \item easy of maintain.
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Developers main concerns}
+
+    \begin{itemize}
+      \item infrastructure stability and resilience
+      \item logs readability
+      \item RabbitMQ
+      \item startup race conditions
+      \item security
+      \item API standardization
+      \item acceptance tests
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Platform installation}
+
+    \begin{itemize}
+      \item working as expected
+      \item created local installation instructions
+      \item minor issues solved or documented
+      \item brings up around 10 services
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Development environment}
+
+    \begin{itemize}
+      \item we were able to setup everything
+      \item spread through several repositories
+      \item highly dependent on Docker and shell scripts
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Tests}
+
+    \begin{itemize}
+      \item coverage above 94\%
+      \item not using mocks
+      \item missing for assuring correct integration between services
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Dependencies}
+
+    \begin{itemize}
+      \item hundreds of outdated packages
+      \item using Kong 0.11.2 while the current is 1.0.3
+      \item rest-client has been unmaintained since 2017
+      \item these are not enough to compromise the platform functionalities
+        \begin{itemize}
+          \item security compromised
+          \item maintenance and evolution harder
+        \end{itemize}
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Pipeline}
+
+    \begin{itemize}
+      \item runs tests only
+      \item the release process is undefined
+      \item there is room for more automation for packaging and deployment
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Additional insights}
+
+    \begin{itemize}
+      \item automatic startup
+      \item up time monitoring
+      \item warn users that the playground isn't a production installation
+      \item logs aggregation
+      \item exception notification
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Discussion}
+    \frametitle{Microservices}
+
+    \begin{itemize}
+      \item it is not questioned if it is the best technical solution
+      \item but is it feasible with the current development effort?
+        \begin{itemize}
+          \item complex deployment
+          \item harder to keep dependencies updated
+          \item harder to develop new features
+        \end{itemize}
+      \item a monolith has its own downsides
+    \end{itemize}
+  \end{frame}
+\end{document}

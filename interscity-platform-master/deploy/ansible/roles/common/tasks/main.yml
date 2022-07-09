@@ -1,0 +1,28 @@
+---
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+
+#- name: add debian backport repository
+#  apt_repository:
+#    repo: 'deb http://http.debian.net/debian stretch-backports main'
+#    state: present
+
+- name: install ca-certificates package
+  apt:
+    name: ca-certificates
+    state: present
+
+- name: install apt-transport-https package
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Install vim
+  package: name=vim state=present
+
+- name: Install git
+  package: name=git state=present
