@@ -21,6 +21,7 @@ class DB(object):
   dbIds = False
   try:
    dbIds = Sensors.create(localid=sensorLocalID,uuid=uuid, capabilities = capabilities)
+   # NAO tem capabilites do create_db.py Sensors
    print("LocalId and UUID linked in db")
   except:
    print("Error registering in db")

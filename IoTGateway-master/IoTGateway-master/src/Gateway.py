@@ -13,7 +13,7 @@ app = Flask(__name__)
 def index():
     return "HW"
 
-@app.route('/virtualizers', methods=['GET', 'POST', 'DELETE'])
+@app.route('/virtualizers', methods=['GET', 'POST', 'DELETE']) # METODO INCOMPLETO 
 def virtualizers():
     if request.method == 'GET':
         return "return all virtualizers addrs"
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     w1 = threading.Thread(target = mqttGateway.startListening, args=("ctuqpqym","Xk5GNcWqcmZG"))
  #   w2 = threading.Thread(target = coapGateway.startListening)
 #    w3 = threading.Thread(target= coapGateway.requestSensorData)
-    w4 = threading.Thread(target = app.run)
+    w4 = threading.Thread(target = app.run) # Flask
 
     
     w1.start()

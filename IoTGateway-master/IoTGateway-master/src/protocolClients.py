@@ -55,7 +55,7 @@ class MqttClass (ProtocolClient):
 		print("Received a Message")
 		receivedData = json.loads(msg.payload)
 	
-		self.dataProcessing(client,receivedData)		
+		self.dataProcessing(client,receivedData) #manda para o IC	
 
 		end = timeit.timeit()
 		print('Runtime:')
@@ -69,7 +69,7 @@ class MqttClass (ProtocolClient):
 		self.mqttClient.connect(self.mqttAddress,self.mqttPort,self.mqttTimeout)
 		self.mqttClient.subscribe(self.mqttTopic)	
 		print('Connected')
-		self.mqttClient.on_message = self.on_message	
+		self.mqttClient.on_message = self.on_message  # manda para IC	
 		self.mqttClient.loop_forever()
 
 #-----------------------------COAP--------------------------------------------
