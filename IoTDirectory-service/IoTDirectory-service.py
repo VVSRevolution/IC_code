@@ -4,7 +4,7 @@ import socket
 from datetime import datetime
 
 PORT = "8080"
-HOST = "127.0.0.1"
+HOST = socket.gethostbyname(socket.gethostname())
 
 db = peewee.SqliteDatabase('IoTDirectory-service/database_ds.db')
 
@@ -31,9 +31,9 @@ except:
 
 context = zmq.Context()
 s = context.socket(zmq.PUB)    
-p = "tcp://"+ HOST +":"+ PORT           # how and where to communicate
-t=s.bind(p)                               # bind socket to the address
+p = "tcp://"+ HOST +":"+ PORT
+t=s.bind(p)
 connectionTime = datetime.now()
 print(t)
 while True:
-    s.send_string("[DirectoryService] " + "HI")
+    s.send_string("[DirectoryService]: " + "HI")
