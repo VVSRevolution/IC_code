@@ -17,7 +17,7 @@ class Register(object):
         pass
     
     def regData(self,regInfos):
-        print("[Register] REGISTRANDO RECURSO VIRTUAL NA INCT")
+        print("[REGISTER]:\tREGISTRANDO RECURSO VIRTUAL NA INCT")
         print(self.inctaddr)
         resourceData = {
             'data':regInfos['regInfos']
@@ -41,22 +41,22 @@ class Register(object):
             print(response.text)
             return response.text
         except:
-            print("[REGISTER]Erro no Registro")
+            print("[REGISTER]:\tErro no Registro")
             return -1
 
     def regCap(self,regInfos):
-        print("[Register] REGISTRANDO CAPABILITY NA INCT")
+        print("[REGISTER]:\tREGISTRANDO CAPABILITY NA INCT")
         try:
             response = requests.post (self.inctaddr + '/catalog/capabilities/', data = json.dumps(regInfos), headers=self.headers)
             print(response.text)
             return response.text
         except:
-            print("[REGISTER]Erro no Registro")
+            print("[REGISTER]:\tErro no Registro")
             return -1
 
     def regIoTGateway(self,regInfos): #REGISTRO IOTGateway
         # busca inicial apenas pelo uuid
-        print("[REGISTER] CADASTRANDO NO IOT GATEWAY")
+        print("[REGISTER]:\tCADASTRANDO NO IOT GATEWAY")
 
         for sensor in regInfos["realSensors"]:
             response = requests.get(self.inctaddr + '/catalog/resources/' + sensor["uuid"], headers=self.headers)

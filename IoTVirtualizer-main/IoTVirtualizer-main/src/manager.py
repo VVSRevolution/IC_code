@@ -12,14 +12,14 @@ import time
 
 class Manager (object):
     def __init__(self):
-        print("[MANAGER] MANAGER INICIADO")
+        print("[MANAGER]:\tMANAGER INICIADO")
         self.sender = Sender()
         self.register = Register()
         self.cataloguer = Cataloguer()
         self.dataProcessor = DataProcessor()
 
     def manageSendData(self,data):
-        print("[MANAGER] Envio de dados Iniciado")
+        print("[MANAGER]:\tEnvio de dados Iniciado")
         return self.sender.sendData(data)
 
     def manageRegistResource(self,data):
@@ -52,14 +52,14 @@ class Manager (object):
             response = self.cataloguer.saveData(data)
             return response
         except:
-            return "[MANAGER] Erro no processo de recebimento de dados"
+            return "[MANAGER]:\tERRO no processo de recebimento de dados"
 
     def processActivator(self, sleepTime):
         #requisitos satisfeitos?
         processos = ResourceCapability.select()
         i=0
         while(1):
-            print("[MANAGER] ProcessActivator Iniciado")
+            print("[MANAGER]:\tProcessActivator Iniciado")
             for rescap in processos:
                 ini = time.time()
                 cap = Capabilities.select(Capabilities.association, Capabilities.name).where(Capabilities.id==rescap.capability).get()
@@ -76,7 +76,7 @@ class Manager (object):
                     diference = datetime.now() - value["timestamp"]
                 
                     if(diference > timedelta(minutes = 10)):
-                        print("[MANAGER] Dado deletado da DB: timestamp > 10 min")
+                        print("[MANAGER]:\tDado deletado da DB: timestamp > 10 min")
                         querry = SensorData.delete().where(SensorData.timestamp == value["timestamp"])
                         querry.execute()
 
@@ -93,7 +93,7 @@ class Manager (object):
                 #print("dados encontrados")
                 #print("-------------")
                 if(qtdData>=1):
-                    print("[MANAGER] Processando Dado")
+                    print("[MANAGER]:\tProcessando Dado")
                     self.dataProcessor.start(dataList, association, cap["name"], uuid)
                 fim = time.time()
 

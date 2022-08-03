@@ -9,11 +9,11 @@ class Cataloguer(object):
     #realiza cadastro/ponto de acesso dos dados na db
     def consultResource(self):
         try:
-            print("[Cataloguer] Consultando Resources")
+            print("[CATALOGUER]:\tConsultando Resources")
             resources = VirtualRes.select()
             return resources
         except:
-            print("[Cataloguer] Erro no processo de consulta do Resource")
+            print("[CATALOGUER]:\tERRO no processo de consulta do Resource")
             return -1
 
     def saveResource(self,data,uuid):
@@ -26,7 +26,7 @@ class Cataloguer(object):
                 timestamp = datetime.now()
             )
             #adicionar tratamento capabilities
-            print("[Cataloguer] Registrando VirtualResource na DB")
+            print("[CATALOGUER]:\tRegistrando VirtualResource na DB")
             print(res)
             res.save()
             
@@ -64,24 +64,24 @@ class Cataloguer(object):
             print("t2")
             return res
         except:
-            print("[Cataloguer] Erro no salvamento do Recurso")
+            print("[CATALOGUER]:\tErro no salvamento do Recurso")
             return -1
     def consultRealSensors(self):
         try:
-            print("[Cataloguer] Consultando realSensors")
+            print("[CATALOGUER]:\tConsultando realSensors")
             rSensors = RealSensors.select()
             return rSensors
         except:
-            print("[Cataloguer] Erro no processo de consulta dos Sensores Reais")
+            print("[CATALOGUER]:\tERRO no processo de consulta dos Sensores Reais")
             return -1        
 
     def consultCapabilities(self):
         try:
-            print("[Cataloguer] Consultando Capabilities")
+            print("[CATALOGUER]:\tConsultando Capabilities")
             capabilities = Capabilities.select()
             return capabilities
         except:
-            print("[Cataloguer] Erro no processo de consulta da Capability")
+            print("[CATALOGUER]:\tErro no processo de consulta da Capability")
             return -1
 
     def saveCapability(self,data):
@@ -92,12 +92,12 @@ class Cataloguer(object):
                 description = data["description"],
                 association = data["association"]
             )
-            print("[Cataloguer] Registrando nova Capability na DB")
+            print("[CATALOGUER]:\tRegistrando nova Capability na DB")
             print(cap)
             cap.save()
             return cap
         except:
-            print("[Cataloguer] Erro no salvamento da Capability")
+            print("[CATALOGUER]:\tERRO no salvamento da Capability")
             return -1
             
     def consultData(self):

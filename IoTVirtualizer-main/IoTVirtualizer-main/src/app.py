@@ -3,15 +3,20 @@ from flask import Flask, request, jsonify, render_template
 from flask.wrappers import Response
 from manager import Manager
 from cataloguer import Cataloguer
+import socket, threading, zmq, time, csv
 
-import time
-import csv
+
 
 app = Flask(__name__)
+
+LOCAL_HOST = socket.gethostbyname(socket.gethostname())
+FORMAT = 'utf-8'
+
 
 @app.route('/')
 def index():
     return render_template("index.html")
+
 
 @app.route('/resources', methods =['GET', 'POST', 'DELETE'])
 def receiver():
@@ -40,7 +45,7 @@ def receiver():
             f.close()
             return jsonify(response.__dict__["__data__"])
         except:
-            return "[Receiver] Erro no processo de cadastro de um novo Recurso Virtual\n"
+            return "[RECEIVER]:\tErro no processo de cadastro de um novo Recurso Virtual\n"
 
 @app.route('/capabilities', methods =['GET', 'POST', 'DELETE'])
 def capabilities():
@@ -87,15 +92,45 @@ def data():
             f.close()
             return jsonify("{}")
         except:
-            return "[RECEIVER] Erro no processo de recebimento da dados do sensor"
+            return "[RECEIVER]:\tErro no processo de recebimento da dados do sensor"
 
-import threading
+def sendToDS(portF):
+    
+    print("\n-----------------------------------DIRECTORY SERVICE-----------------------------------\n")
+    DShost = input("[APP]:\t\tEnter directory service host: ")
+    DSport = input("[APP]:\t\tEnter directory service port: ")   
+    try:
+        context = zmq.Context()
+        socket = context.socket(zmq.REQ)
+        socket.connect("tcp://"+ DShost +":"+ DSport)
+
+        socket.send_string(f"V${LOCAL_HOST}${portF}")
+        msg = socket.recv().decode(FORMAT)
+        print(msg)
+    except:
+        print("[APP]:\t\tERROR ao mandar ADDR ao Directory Service ")
+        
+
+
+
 
 if __name__ == "__main__":
     manager = Manager()
     cataloguer = Cataloguer() # so pra testar
+    hostF = "0.0.0.0"
+    portF = 8000
+
     w1 = threading.Thread(target = manager.processActivator, args=(60,))
-    
     w1.start()
-    app.run(host = "0.0.0.0", port = 8000)
+    time.sleep(1)
+    print("\n-----------------------------------------FLASK-----------------------------------------\n")
+    threading.Thread(target=lambda: app.run(host = hostF, port = portF, debug=True, use_reloader=False)).start()
+    time.sleep(1)
+    sendDS = threading.Thread(target = sendToDS, args=(portF,))
+    sendDS.start()
+
+
+
+    
+    
 

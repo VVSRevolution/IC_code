@@ -42,6 +42,6 @@ if __name__ == "__main__":
             ResourceCapability,
             SensorData
         ])
-        print("Tabelas Criadas")    
+        print("[DATABASE]:\tTabelas Criadas")    
     except:
-        print("Erro na criação das tabelas")
+        print("[DATABASE]:\tErro na criação das tabelas")
