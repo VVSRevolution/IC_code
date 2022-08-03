@@ -5,6 +5,9 @@ from datetime import datetime
 
 PORT = "8080"
 HOST = socket.gethostbyname(socket.gethostname())
+HOST = "127.0.1.1"
+
+FORMAT = 'utf-8'
 
 db = peewee.SqliteDatabase('IoTDirectory-service/database_ds.db')
 
@@ -13,11 +16,13 @@ class BaseModel(peewee.Model):
         database = db
 
 class Virtualizer(BaseModel):
-    ipADDR = peewee.TextField(default=None)
+    ipVirtualizer = peewee.TextField(default=None)
+    portVirtualizer = peewee.TextField(default=None)
     registerTime = peewee.DateTimeField(default=datetime.now())
 
 class Gateway(BaseModel):
-    ipADDR = peewee.TextField(default=None)
+    ipGateway = peewee.TextField(default=None)
+    portGateway = peewee.TextField(default=None)
     registerTime = peewee.DateTimeField(default=datetime.now())
 
 try:
@@ -30,10 +35,43 @@ except:
     print("[DATABASE]:\t[ERRO] ao criar tabela")
 
 context = zmq.Context()
-s = context.socket(zmq.PUB)    
-p = "tcp://"+ HOST +":"+ PORT
-t=s.bind(p)
-connectionTime = datetime.now()
-print(t)
+socket = context.socket(zmq.REP)   
+on = socket.bind("tcp://"+ HOST +":"+ PORT)
+print(on)
+
 while True:
-    s.send_string("[DirectoryService]: " + "HI")
+    message = socket.recv().decode(FORMAT)
+    print("Received request: %s" % message)
+    try:
+
+        data = message.split("$")
+        ip = data[1]
+        port = data[2]
+    
+    
+        if(data[0].upper() == "V"):
+            try:
+                virtualizer = Virtualizer.create(
+                    ipVirtualizer = ip,
+                    portVirtualizer = port,
+                    registerTime = datetime.now()
+                )
+                status = f"[DIRECTORY SERVICE]:\tVirtualizer {ip}:{port} foi cadastrado."
+            except:
+                status = f"[DIRECTORY SERVICE]:\tVirtualizer {ip}:{port} já esta cadastrado."
+
+        if(data[0].upper() == "G"):
+            try:
+                virtualizer = Gateway.create(
+                    ipGateway = ip,
+                    portGateway = port,
+                    registerTime = datetime.now()
+                )
+                status = f"[DIRECTORY SERVICE]:\tVirtualizer {ip}:{port} foi cadastrado."
+            except:
+                status = f"[DIRECTORY SERVICE]:\tVirtualizer {ip}:{port} já esta cadastrado."
+        socket.send_string(status)
+    except:
+        status ="[DIRECTORY SERVICE]:\t ERROR estrada não formatada corretamente"
+        socket.send_string(status)
+    
