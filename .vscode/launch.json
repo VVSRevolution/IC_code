@@ -12,8 +12,8 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "cwd" :"${workspaceFolder}/IoTVirtualizer-main/IoTVirtualizer-main/src",
-            "program": "${workspaceFolder}/IoTVirtualizer-main/IoTVirtualizer-main/src/app.py",
+            //"cwd" :"${workspaceFolder}/IoTVirtualizer-main/IoTVirtualizer-main/src",
+            //"program": "${workspaceFolder}/IoTVirtualizer-main/IoTVirtualizer-main/src/app.py",
             //"cwd" :"${workspaceFolder}/IoTGateway-master/IoTGateway-master/src",
             //"program": "${workspaceFolder}/IoTGateway-master/IoTGateway-master/src/Gateway.py",
             "stopOnEntry": false
