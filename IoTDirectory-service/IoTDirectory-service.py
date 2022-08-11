@@ -1,8 +1,10 @@
+from ast import While
+from re import T
 import peewee,zmq,socket,threading
 from datetime import datetime
 
 FORMAT = 'utf-8'
-PORT = 808080
+PORT = 8080
 HOST = socket.gethostbyname(socket.gethostname())
 HOST = "127.0.1.1" #just for test <------------------- REMOVE THIS LINE
 
@@ -39,24 +41,19 @@ def sendIp(): # envia os ADDR dos virtualizers e geteways
     p = f"tcp://{(HOST)}:{PortSend}"
     print(f"[DIRECTORY SERVICE]:\t Mandando dados em {p}")
     s.bind(p)
+    while(True):
+        query = Virtualizer.select(Virtualizer.ipVirtualizer, Virtualizer.portVirtualizer)
+        virtualizerData = ""
+        for virtualizer in query:
+            virtualizerData += f"{virtualizer.ipVirtualizer}:{virtualizer.portVirtualizer}\n"
 
-    query = Virtualizer.select(Virtualizer.ipVirtualizer, Virtualizer.portVirtualizer)
-    virtualizerData = ""
-    for virtualizer in query:
-        virtualizerData += f"{virtualizer.ipVirtualizer}:{virtualizer.portVirtualizer}\n"
+        query = Gateway.select(Gateway.ipGateway, Gateway.portGateway)
+        gatewayData = ""
+        for gateway in query:
+            gatewayData += f"{gateway.ipGateway}:{gateway.portGateway}\n"
 
-    query = Gateway.select(Gateway.ipGateway, Gateway.portGateway)
-    gatewayData = ""
-    for gateway in query:
-        gatewayData += f"{gateway.ipGateway}:{gateway.portGateway}\n"
-
-    #testar saida de dados 
-    #print(virtualizerData) 
-    #print(gatewayData)
-
-
-    s.send_string("virtualizer" + virtualizerData)
-    s.send_string("gateway" + gatewayData)
+        s.send_string("virtualizer " + virtualizerData)
+        s.send_string("gateway " + gatewayData)
 
 
 def getIp(): # recebe os ADDR dos virtualizers e geteways
