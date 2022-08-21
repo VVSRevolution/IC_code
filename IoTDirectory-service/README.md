@@ -1,2 +1,3 @@
 # IoTDirectory-service
-<img src="Arquitetura com DS.svg" width="350">
+<div md-colors="{background: 'grey-A100'}">
+<img src="Arquitetura com DS.svg" width="1080">
