@@ -1,2 +1,2 @@
 # IoTDirectory-service
-<img src="Protocol.png" width="350">
+<img src="Arquitetura com DS.svg" width="350">
