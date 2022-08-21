@@ -9,6 +9,7 @@ img {
 </style>
 </head>
 <body>
+<div md-colors="{background: 'grey-50'}">
 <p align="center"><img src="Arquitetura com DS.svg"  width="1080"/></p>
 </body>
 </html>
