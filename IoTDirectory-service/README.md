@@ -1,5 +1,3 @@
-# IoTDirectory-service
-
 <style type="text/css">
 .myicon {
         display: inline-block;
