@@ -1,6 +1,2 @@
 # IoTDirectory-service
-
-<body {
- background-image: url("Arquitetura-com-DS.svg");
- background-color: #ffffff;
-}>
+<img src="Arquitetura com DS.svg" width="1080">
