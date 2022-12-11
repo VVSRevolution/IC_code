@@ -12,6 +12,11 @@ class BaseModel(peewee.Model):
     class Meta:
         database = db
 
+class Manager(BaseModel):
+    ipManager = peewee.TextField(default=None)
+    portManager = peewee.TextField(default=None)
+    registerTime = peewee.DateTimeField(default=datetime.now())
+
 class Virtualizer(BaseModel):
     ipVirtualizer = peewee.TextField(default=None)
     portVirtualizer = peewee.TextField(default=None)
@@ -25,7 +30,8 @@ class Gateway(BaseModel):
 try:
     db.create_tables([
         Virtualizer,
-        Gateway    
+        Gateway,
+        Manager    
     ])
     print("[DATABASE]:\t[OK] ao criar tabela")
 except:
