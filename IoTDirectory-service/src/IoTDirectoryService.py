@@ -95,9 +95,9 @@ def getIp(): # recebe os ADDR dos virtualizers e geteways
                         portGateway = port,
                         registerTime = datetime.now()
                     )
-                    status = f"[DIRECTORY SERVICE]:\tVirtualizer {ip}:{port} foi cadastrado."
+                    status = f"[DIRECTORY SERVICE]:\tGateway {ip}:{port} foi cadastrado."
                 except:
-                    status = f"[DIRECTORY SERVICE]:\tVirtualizer {ip}:{port} já esta cadastrado."
+                    status = f"[DIRECTORY SERVICE]:\tGateway {ip}:{port} já esta cadastrado."
             socket.send_string(status)
         except:
             status ="[DIRECTORY SERVICE]:\t ERROR estrada não formatada corretamente"
@@ -108,3 +108,4 @@ sendIP = threading.Thread(target = sendIp)
 getIP = threading.Thread(target = getIp)
 getIP.start()
 sendIP.start()
+print("[DIRECTORY SERVICE]:\tINICIADO")

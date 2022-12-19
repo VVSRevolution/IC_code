@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoTManager</title>
+</head>
+<body style="margin-left: 100px;font-family: Arial">
+    
+    <h1>IoTManager:</h1>
+
+    <div style="float:left;padding: 20px;">
+        <h3>Consultar ADDR:</h3>
+
+        <div style="float:left;padding: 20px;">
+        
+            <form action="/virtualizer">
+                <button style="padding: 10px;">Virtualizer</button>
+            </form>
+            
+        </div>
+
+        <div style="float:left;padding: 20px;">
+            <form action="/gateway">
+                <button style="padding: 10px;">Gateway</button>
+            </form>
+        </div>
+
+        <div style="float:left;padding: 20px;">
+            <form  action="/manager">
+                <button style="padding: 10px;">Manager</button>
+            </form>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+
+    
+
+    <div style="float:left;padding: 20px;">
+        <h3>Consultar Dados:</h3>
+
+        <div style="float:left;padding: 20px;">
+            <label for="">Gateway:</label><br /><br />
+            <form  action="/gateway">
+                <input type="text" name = "virtualizerHost" placeholder="HOST:PORT"> <br /><br />
+                <button style="padding: 5px; width:100%; height:100%; border: 1px solid">Consultar</button>
+            </form>
+        </div>
+
+        <div style="float:left;padding: 20px;">
+            <label for="">Virtualizer:</label><br /><br />
+            <form action="/virtualizer/{{virtualizerHost}}">
+                <input type="text" name = "virtualizerHost" placeholder="HOST:PORT"> <br /><br />
+                <button style="padding: 5px; width:100%; height:100%; border: 1px solid">Consultar</button>
+            </form>
+        </div>
+    </div>
+    
+
+    <div style="float:left;padding: 20px;">
+        <h3>Regitrar no Virtualizar:</h3>
+        
+        <div style="float:left;padding: 10px;">
+            <label for="">Capabilite:</label>
+            <form style="margin-right: 10px;" action="/"><br />
+                <input type="text" name="capabilite_addr" placeholder="HOST:PORT"><br />
+                <input type="text" name="capabilite_nome" placeholder="Nome"><br />
+                <input type="text" name="capabilite_description" placeholder="Description"><br />
+                <input type="text" name="capabilite_capability_type" placeholder="Capability type"><br />
+                <input type="text" name="capabilite_association" placeholder="Association"><br /><br /><br />
+                <button style="float:inline-start;padding: 5px;width:100%; height:100%; border: 1px solid">Registrar</button>
+            </form>
+        </div>
+
+        <div style="float:left;padding: 10px;">
+            <label for="">Recurso:</label><br /><br />
+            <form style="" action="/">
+                <input type="text" name="recurso_uuid" placeholder="UUID"><br />
+                <input type="text" name="sensor_cap1" placeholder="Capabilite 1"><br />
+                <input type="text" name="sensor_cap2" placeholder="Capabilite 2"><br />
+                <input type="text" name="sensor_status" placeholder="Status"><br />
+                <input type="text" name="sensor_lat" placeholder="Latitude"><br />
+                <input type="text" name="sensor_lon" placeholder="Longitude"><br /><br />
+                <button style="float:inline-start;padding: 5px;width:100%; height:100%; border: 1px solid">Registrar</button>&nbsp;
+            </form>
+        </div>
+    </div>
+</body>
+</html>
