@@ -41,7 +41,7 @@ def gateway():
     try:
         print("[MANAGER]:\tConsultando Resources em /gateway")
         resources = Gateway.select()
-    except:
+    except:   
         print("[MANAGER]:\tERRO no processo de consulta do Resource em /gateway")
     else:
         return render_template("table.html", headings=headers, data=resources)
