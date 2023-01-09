@@ -42,25 +42,24 @@
 
     <div style="float:left;padding: 20px;">
         <h3>Consultar Dados:</h3>
-
+        <!--Abrir Gateway dados-->
         <div style="float:left;padding: 20px;">
             <label for="">Gateway:</label><br /><br />
-            <form  action="/gateway">
-                <input type="text" name = "virtualizerHost" placeholder="HOST:PORT"> <br /><br />
+            <form  method="post">
+                <input type="text" name = "gatewayHost" placeholder="HOST:PORT"> <br /><br />
                 <button style="padding: 5px; width:100%; height:100%; border: 1px solid">Consultar</button>
             </form>
         </div>
-
+        
+        <!--Abrir Virtualizer dados--> 
         <div style="float:left;padding: 20px;">
             <label for="">Virtualizer:</label><br /><br />
-            <form action="/virtualizer/{{virtualizerHost}}">
+            <form method="post">
                 <input type="text" name = "virtualizerHost" placeholder="HOST:PORT"> <br /><br />
                 <button style="padding: 5px; width:100%; height:100%; border: 1px solid">Consultar</button>
             </form>
         </div>
     </div>
-    
-
     <div style="float:left;padding: 20px;">
         <h3>Regitrar no Virtualizar:</h3>
         

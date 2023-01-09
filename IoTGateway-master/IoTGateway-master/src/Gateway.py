@@ -1,6 +1,7 @@
 from protocolClients import MqttClass
 from protocolClients import CoapClass
 from db import DB
+from create_db import Sensors
 import socket, threading, zmq, time
 
 from flask import Flask, request, jsonify, render_template
@@ -27,6 +28,19 @@ def virtualizers():
           return jsonify("{}")
         except:
             return "Erro no cadastro do virtualizador no IOTGateway"
+
+@app.route('/sensor', methods=['GET']) # METODO INCOMPLETO 
+def sensors():
+    if request.method == 'GET':
+        headers = ("id","local_id","uuid")
+        try:
+            print("[DB_SENSOR]:\tConsultando Resources")
+            resources = Sensors.select()
+        except:
+            print("[DB_SENSOR]:\tERRO no processo de consulta do Resource")
+        else:
+            return render_template("table.html", headings=headers, data=resources)
+        
 
 def sendToDS(portF):
     
