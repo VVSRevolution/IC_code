@@ -6,7 +6,7 @@ PORT = 8080
 HOST = socket.gethostbyname(socket.gethostname())
 HOST = "127.0.1.1" #just for test <------------------- REMOVE THIS LINE
 
-db = peewee.SqliteDatabase('IoTDirectory-service/database_ds.db')
+db = peewee.SqliteDatabase('IoTManager/IoTManager-low/database_ds.db')
 
 class BaseModel(peewee.Model):
     class Meta:

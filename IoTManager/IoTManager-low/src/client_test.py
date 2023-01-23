@@ -4,6 +4,7 @@ FORMAT = 'utf-8'
 PORT = 8080
 HOST = "127.0.1.1"
 
+#ESSE PROGRAMA E SOMENTE PARA TESTAR O DS 
 
 #DShost = input("[APP]:\tEnter directory service host: ")
 #DSport = input("[APP]:\tEnter directory service port: ")

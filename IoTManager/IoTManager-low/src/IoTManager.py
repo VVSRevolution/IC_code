@@ -3,6 +3,7 @@ import socket, requests, json
 from datetime import datetime
 from IoTDirectoryService import Virtualizer, Gateway, Manager
 
+
 LOCAL_HOST = socket.gethostbyname(socket.gethostname())
 FORMAT = 'utf-8'
 
