@@ -13,6 +13,8 @@ def IoTmanager():
     if request.method == 'GET':
         return render_template("IoTmanager.html")
     if request.method == 'POST':
+
+    # Consultar Dados
         virtualizerHost = request.form.get("virtualizerHost")
         gatewayHost = request.form.get("gatewayHost")
         print(f"[MANAGER]:\tMethod = POST, virtualizerHost = {virtualizerHost}")
@@ -23,6 +25,42 @@ def IoTmanager():
         if(virtualizerHost  != None):
             print(f"[MANAGER]:\tRedirect to /virtualizer/{virtualizerHost}")
             return redirect(url_for('virtualizer_uuid',host=virtualizerHost))
+
+    # Registrar no virtualizer 
+        #capabilites
+        capabiliteAddr              = request.form.get("capabilite_addr")
+        capabiliteNome              = request.form.get("capabilite_nome")
+        capabiliteDescription       = request.form.get("capabilite_description")
+        capabiliteCapabilityType    = request.form.get("capabilite_capability_type")
+        capabiliteAssociation       = request.form.get("capabilite_association")
+        headers= {'Content-type': 'application/json',}
+
+        if(True):
+            print(f"[MANAGER]:\tCadastrando {capabiliteNome}")
+            msg = {
+                "name":capabiliteNome,
+                "description":capabiliteDescription,
+                "capability_type":capabiliteCapabilityType,
+                "association": capabiliteAssociation 
+	        }
+            try:
+                requests.post (f'http://{capabiliteAddr}/capabilities', data = json.dumps(msg),headers=headers)
+            except:
+                print(f"[MANAGER]:\tNão foi possivel cadastrar {capabiliteNome}")
+                erroMsg1 = f"[MANAGER]:\tNão foi possivel cadastrar {capabiliteNome}"
+                      #redirect(url_for('gateway_uuid',host=gatewayHost))
+                return redirect(url_for('erro_m',erroMsg=erroMsg1))
+
+        #recurso
+        recursoUUID     = request.form.get("recurso_uuid")
+        sensorCap1      = request.form.get("sensor_cap1")
+        sensorCap2      = request.form.get("sensor_cap2")
+        sensorStatus    = request.form.get("sensor_status")
+        sensorLat       = request.form.get("sensor_lat")
+        sensorLon       = request.form.get("sensor_lon")
+
+
+        
     return render_template("IoTmanager.html")
 
 @IoTmaganer.route('/virtualizer')
@@ -91,6 +129,10 @@ def gateway_uuid(host):
     except:
         return f"<h1>ERRO:</h1> <h2>Virtualizador ({host}) não existe ou esta offline</h2>"
 
+@IoTmaganer.route('/erro')
+def erro_m(erroMsg):
+    erroMsg = "<h1>ERRO</h1>"
+    return erroMsg
 
 if __name__ == "__main__":
     portF = 9000
