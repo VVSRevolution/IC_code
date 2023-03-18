@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoTManager</title>
+</head>
+<body style="margin-left: 100px;font-family: Arial">
+    
+    <h1>IoTManagerHigh:</h1>
+
+    <!--CONSULTATION--> 
+    <div style="float:left;padding: 20px;">
+        <h3>Consultar:</h3>
+
+        <div style="float:left;padding: 20px;">
+        
+            <form action="/father">
+                <button style="padding: 10px;">Father</button>
+            </form>
+            
+        </div>
+
+        <div style="float:left;padding: 20px;">
+            <form action="/sons">
+                <button style="padding: 10px;">Sons</button>
+            </form>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+
+
+    <!--REGISTRATION--> 
+    <div style="float:left;padding: 20px;">
+        <h3>Registrar no Virtualizar:</h3>
+        
+        <div style="float:left;padding: 10px;">
+            <label for="">Son:</label>
+            <form style="margin-right: 10px;" method="post" ><br />
+                <input type="text" name="m_son_ip" placeholder="IP"><br />
+                <input type="text" name="m_son_port" placeholder="PORT"><br />
+                <input type="text" name="m_son_desc" placeholder="Description"><br />
+                <br />
+                <button style="float:inline-start;padding: 5px;width:100%; height:100%; border: 1px solid">Registrar</button>
+            </form>
+        </div>
+
+        <div style="float:left;padding: 10px;">
+            <label for="">Father:</label><br /><br />
+            <form method="post">
+                <input type="text" name="m_son_ip" placeholder="IP"><br />
+                <input type="text" name="m_son_port" placeholder="PORT"><br />
+                <input type="text" name="m_son_desc" placeholder="Description"><br />
+                <br />
+                <button style="float:inline-start;padding: 5px;width:100%; height:100%; border: 1px solid">Registrar</button>&nbsp;
+            </form>
+        </div>
+    </div>
+
+
+</body>
+</html>

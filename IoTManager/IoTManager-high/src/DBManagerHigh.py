@@ -9,7 +9,13 @@ class BaseModel(peewee.Model):
     class Meta:
         database = db
 
-class ManagerHigh(BaseModel):
+class ManagerHighFather(BaseModel):
+    ipManager = peewee.TextField(default=None)
+    portManager = peewee.TextField(default=None)
+    description = peewee.TextField(default=None)
+    registerTime = peewee.DateTimeField(default=datetime.now())
+
+class ManagerHighSons(BaseModel):
     ipManager = peewee.TextField(default=None)
     portManager = peewee.TextField(default=None)
     description = peewee.TextField(default=None)
@@ -17,7 +23,8 @@ class ManagerHigh(BaseModel):
 
 try:
     db.create_tables([
-        ManagerHigh    
+        ManagerHighFather,
+        ManagerHighSons    
     ])
     print("[DATABASE_MANAGER-HIGH]:\t[OK] ao criar tabela")
 except:
