@@ -15,13 +15,33 @@ def IoTmanager():
     if request.method == 'POST':
         headers= {'Content-type': 'application/json',}
 
-        ipSon = request.form.get("m_sons_ip")
-        portSon = request.form.get("m_sons_port")
-        descSon = request.form.get("m_sons_desc")
+        ipSon = request.form.get("m_son_ip")
+        portSon = request.form.get("m_son_port")
+        descSon = request.form.get("m_son_desc")
 
         ipFather = request.form.get("m_father_ip")
         portFather = request.form.get("m_father_port")
-        descFather = request.form.get("m_father_desc")     
+        descFather = request.form.get("m_father_desc") 
+        print(f"[MANAGER_HIGH]:\tCadastrando {ipSon}:{portSon} ...")
+        if(ipSon!= None and portSon!=None):
+            managerdb = ManagerHighSons.create(
+                        ipManager = ipSon,
+                        portManager = portSon,
+                        description = descSon,
+                        registerTime = datetime.now()
+            )
+            print(f"[MANAGER_HIGH]:\tConectando com {ipSon}:{portSon} ... ")
+            msg = {
+                    "ip":LOCAL_HOST,
+                    "port": portF,
+                    "description":managerDescription
+                } 
+            try:
+                requests.post (f'http://{ipSon}:{portSon}/setupfather', data = json.dumps(msg),headers=headers)
+                print(f"[MANAGER_HIGH]:\tPOST \"http://{ipSon}:{portSon}/setupfather\" realizado")
+            except:
+                print(f"[MANAGER_HIGH]:\tERRO ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\"")
+
         
 
     return render_template("IoTManagerHigh.html")
@@ -53,62 +73,60 @@ def father():
 @IoTmaganer.route('/setupfather',methods =['GET', 'POST', 'DELETE'])
 def setupfather():
     if request.method == 'POST':
-      
-        ipFather = request.form.get("m_sons_ip")
-        portFather = request.form.get("m_sons_port")
-        descFather = request.form.get("m_sons_desc")
 
         try:
-            print("[MANAGER_HIGH]:\tUpdating Father")
-            query = ManagerHighFather.get()
-            print(query.unregisterTime)
-            if(query.ipManager == ipFather and query.portManager == portFather):
-                query.lastUpdateTime = datetime.now()
-                query.description = descFather
-            else:
-                managerdb = ManagerHighFather.create(
-                    ipManager = query.ipManager,
-                    portManager = query.portManager,
-                    description = query.description,
-                    registerTime = query.registerTime,
-                    lastUpdateTime = query.lastUpdateTime,
-                    unregisterTime = datetime.now()
-                )
-                query.ipManager = ipFather
-                query.portManager = portFather
-                query.description = descFather
-                query.lastUpdateTime = None
-                query.registerTime = datetime.now()
-                query.save()
-        except:
-            print("[MANAGER_HIGH]:\tCreateing Father")
-            managerdb = ManagerHighFather.create(
-                ipManager = "test",
-                portManager = "portF",
-                description = "managerDescription",
-                registerTime = datetime.now()
-            )
-            print("criador pai")
-     
+            data = request.get_json()
 
+            ipFather = data["ip"]
+            portFather = data["port"]
+            descFather = data["description"]
+            
+            try:
+                print("[MANAGER_HIGH]:\tUpdating Father")
+                query = ManagerHighFather.get()
+                if(query.ipManager == ipFather and query.portManager == portFather):
+                    query.lastUpdateTime = datetime.now()
+                    query.description = descFather
+                else:
+                    managerdb = ManagerHighFather.create(
+                        ipManager = query.ipManager,
+                        portManager = query.portManager,
+                        description = query.description,
+                        registerTime = query.registerTime,
+                        lastUpdateTime = query.lastUpdateTime,
+                        unregisterTime = datetime.now()
+                    )
+                    query.ipManager = ipFather
+                    query.portManager = portFather
+                    query.description = descFather
+                    query.lastUpdateTime = None
+                    query.registerTime = datetime.now()
+                    query.save()
+            except:
+                print("[MANAGER_HIGH]:\tERRO ao atualizar Father")
+
+        except:
+            print(f"[MANAGER_HIGH]:\tERRO ao receber cadastro do Pai")
+
+    return redirect(url_for('father'))
         
-        return render_template("IoTManagerHigh.html")
     
 
 
 if __name__ == "__main__":
-    portF = 9090
+    portF = 9091
     hostF = "0.0.0.0"
     managerDescription = input("[MANAGER-HIGH]\tDescriçao do Manager High: ")
 
 
     ####TEST##### remover
-    managerdb = ManagerHighSons.create(
-                        ipManager = LOCAL_HOST,
-                        portManager = portF,
-                        description = managerDescription,
-                        registerTime = datetime.now()
-    )
+    if False:
+        managerdb = ManagerHighSons.create(
+                            ipManager = LOCAL_HOST,
+                            portManager = portF,
+                            description = managerDescription,
+                            registerTime = datetime.now()
+        )
     ####TEST end
     
     IoTmaganer.run(host = hostF, port = portF, debug=True, use_reloader=False)
