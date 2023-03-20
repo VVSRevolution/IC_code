@@ -14,6 +14,8 @@ class ManagerHighFather(BaseModel):
     portManager = peewee.TextField(default=None)
     description = peewee.TextField(default=None)
     registerTime = peewee.DateTimeField(default=datetime.now())
+    lastUpdateTime = peewee.DateTimeField(null=True)
+    unregisterTime = peewee.DateTimeField(null=True)
 
 class ManagerHighSons(BaseModel):
     ipManager = peewee.TextField(default=None)
