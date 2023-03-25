@@ -1,13 +1,19 @@
+.table__cell{
+    padding: 8px;
+    color:rgb(0, 0, 0);
+
+}
 .table{
     margin: 1rem;
     border-spacing: 0;
+
 }
 .table__row:nth-child(even){
     background-color:azure;
 }
+.table__cell:last-child{
+    background-color:rgb(255, 255, 255);
+}
 .table__header{
     text-align: left;
-}
-.table__cell{
-    padding: 8px;
 }

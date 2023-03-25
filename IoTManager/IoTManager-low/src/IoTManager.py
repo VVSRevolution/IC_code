@@ -1,7 +1,7 @@
 from flask import *
 import socket, requests, json
 from datetime import datetime
-from IoTDirectoryService import Virtualizer, Gateway, Manager
+from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather
 
 
 LOCAL_HOST = socket.gethostbyname(socket.gethostname())
@@ -128,6 +128,58 @@ def gateway_uuid(host):
         return exit
     except:
         return f"<h1>ERRO:</h1> <h2>Virtualizador ({host}) não existe ou esta offline</h2>"
+    
+@IoTmaganer.route('/father')  
+def father():
+    headers = ("id","IpManager","PortManager","Description","Register Time","Last Update","Unregister Time")
+    try:
+        print("[MANAGER_HIGH]:\tConsultando Resources em /father")
+        resources = ManagerFather.select()
+    except:
+        print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /father")
+    else:
+        return render_template("table.html", headings=headers, data=resources)
+    
+    
+@IoTmaganer.route('/setupfather',methods =['GET', 'POST', 'DELETE'])
+def setupfather():
+    if request.method == 'POST':
+
+        try:
+            data = request.get_json()
+
+            ipFather = data["ip"]
+            portFather = data["port"]
+            descFather = data["description"]
+            
+            try:
+                print("[MANAGER_HIGH]:\tUpdating Father")
+                query = ManagerFather.get()
+                if(query.ipManager == ipFather and query.portManager == portFather):
+                    query.lastUpdateTime = datetime.now()
+                    query.description = descFather
+                else:
+                    managerdb = ManagerFather.create(
+                        ipManager = query.ipManager,
+                        portManager = query.portManager,
+                        description = query.description,
+                        registerTime = query.registerTime,
+                        lastUpdateTime = query.lastUpdateTime,
+                        unregisterTime = datetime.now()
+                    )
+                    query.ipManager = ipFather
+                    query.portManager = portFather
+                    query.description = descFather
+                    query.lastUpdateTime = None
+                    query.registerTime = datetime.now()
+                    query.save()
+            except:
+                print("[MANAGER_HIGH]:\tERRO ao atualizar Father")
+
+        except:
+            print(f"[MANAGER_HIGH]:\tERRO ao receber cadastro do Pai")
+
+    return redirect(url_for('father'))
 
 @IoTmaganer.route('/erro')
 def erro_m(erroMsg):

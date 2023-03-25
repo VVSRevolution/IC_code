@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=devide-width, initial-scale=1.0"/>
-        <title>IoTVirtualizer</title>
+        <title>Table</title>
         <link rel="stylesheet" href="/static/table.css" />
     </head>
     <body>
@@ -15,9 +15,14 @@
             </tr>
             {% for row in data.dicts() %}
             <tr class="table__row">
-                {% for cell in row %}
-                <td class="table__cell">{{ row[cell] }}</td>
-                {% endfor %}
+                <form method="post">
+                    {% for cell in row %}
+                    <td class="table__cell">{{ row[cell] }}</td>
+                    {% endfor %}
+                    <td class="table__cell">
+                        <button style=" height:50%;">Enviar</button>
+                    </td>
+                </form>
             </tr>
             {% endfor %}
         </table>

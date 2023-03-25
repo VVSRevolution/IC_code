@@ -27,11 +27,21 @@ class Gateway(BaseModel):
     portGateway = peewee.TextField(default=None)
     registerTime = peewee.DateTimeField(default=datetime.now())
 
+class ManagerFather(BaseModel):
+    ipManager = peewee.TextField(default=None)
+    portManager = peewee.TextField(default=None)
+    description = peewee.TextField(default=None)
+    registerTime = peewee.DateTimeField(default=datetime.now())
+    lastUpdateTime = peewee.DateTimeField(null=True)
+    unregisterTime = peewee.DateTimeField(null=True)
+
+
 try:
     db.create_tables([
         Virtualizer,
         Gateway,
-        Manager    
+        Manager,
+        ManagerFather   
     ])
     print("[DATABASE]:\t[OK] ao criar tabela")
 except:
