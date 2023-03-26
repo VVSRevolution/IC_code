@@ -9,18 +9,30 @@
     <body>
         <table calss="table">
             <tr class="table__header">
+
                 {% for header in headings %}
                 <th class="table__cell">{{ header }}</th>
                 {% endfor %}
             </tr>
             {% for row in data.dicts() %}
             <tr class="table__row">
+                {{row[2]}}
                 <form method="post">
                     {% for cell in row %}
                     <td class="table__cell">{{ row[cell] }}</td>
+                        {% if loop.index == 1 %}
+                            <input id="id" name="id"  type="hidden"  value="{{ row[cell] }}">
+                        {% endif %}
+                        {% if loop.index == 2 %}
+                            <input id="ip" name="ip"  type="hidden"  value="{{ row[cell] }}">
+                        {% endif %}
+                        {% if loop.index == 3 %}
+                            <input id="port" name="port"  type="hidden"  value="{{ row[cell] }}">
+                        {% endif %}                    
                     {% endfor %}
                     <td class="table__cell">
-                        <button style=" height:50%;">Enviar</button>
+                        <input id="row" name="row"  type="hidden"  value="{{ row }}">
+                        <button type="submit" style="height:50%;">Enviar</button>
                     </td>
                 </form>
             </tr>

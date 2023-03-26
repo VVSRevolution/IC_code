@@ -47,33 +47,58 @@ def IoTmanager():
     return render_template("IoTManagerHigh.html")
     
 
-@IoTmaganer.route('/sons')
+@IoTmaganer.route('/sons',methods =['GET', 'POST'])
 def sons():
-    headers = ("id","ipManager","portManager","description","registerTime")
-    try:
-        print("[MANAGER_HIGH]:\tConsultando Resources em /sons")
-        resources = ManagerHighSons.select()
-    except:
-        print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /sons")
-    else:
-        return render_template("table.html", headings=headers, data=resources)
+    if request.method == 'GET':
+        headers = ("id","ip","port","description","registerTime")
+        try:
+            print("[MANAGER_HIGH]:\tConsultando Resources em /sons")
+            resources = ManagerHighSons.select()
+        except:
+            print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /sons")
+        else:
+            return render_template("table_enviar.html", headings=headers, data=resources)
+        
+    if request.method == 'POST':
+        id = request.form.get('id')
+        port = request.form.get('port')
+        ip = request.form.get('ip')
+        row = request.form.get('row')
+        print(id)
+        print(ip)
+        print(port)
+        #print(row)
+        return redirect(url_for('sons'))#temporario, arrumar para redirecionar  ## ARRUMAR
 
-@IoTmaganer.route('/father')  
+@IoTmaganer.route('/father',methods =['GET', 'POST'])  
 def father():
-    headers = ("id","IpManager","PortManager","Description","Register Time","Last Update","Unregister Time")
-    try:
-        print("[MANAGER_HIGH]:\tConsultando Resources em /father")
-        resources = ManagerHighFather.select()
-    except:
-        print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /father")
-    else:
-        return render_template("table.html", headings=headers, data=resources)
+    
+    if request.method == 'GET':
+        headers = ("id","ip","port","Description","Register Time","Last Update","Unregister Time")
+        try:
+            print("[MANAGER_HIGH]:\tConsultando Resources em /father")
+            resources = ManagerHighFather.select()
+        except:
+            print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /father")
+        else:
+            return render_template("table_enviar.html", headings=headers, data=resources)
+        
+    if request.method == 'POST':
+        id = request.form.get('id')
+        port = request.form.get('port')
+        ip = request.form.get('ip')
+        row = request.form.get('row')
+        print(id)
+        print(ip)
+        print(port)
+        #print(row)
+        return redirect(url_for('father'))#temporario, arrumar para redirecionar  ## ARRUMAR
+        
     
 
 @IoTmaganer.route('/setupfather',methods =['GET', 'POST', 'DELETE'])
 def setupfather():
     if request.method == 'POST':
-
         try:
             data = request.get_json()
 
