@@ -14,7 +14,7 @@ my_enic = [i for i in nics for j in nics[i]
 print('\t\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
     my_enic, my_eip))
 LOCAL_HOST = format(my_eip)
-s.disconnect()
+
 
 FORMAT = 'utf-8'
 
@@ -62,7 +62,7 @@ def IoTmanager():
 @IoTmaganer.route('/sons',methods =['GET', 'POST'])
 def sons():
     if request.method == 'GET':
-        headers = ("id","ip","port","description","registerTime")
+        headers = ("ID","IP","Port","Description","RegisterTime")
         try:
             print("[MANAGER_HIGH]:\tConsultando Resources em /sons")
             resources = ManagerHighSons.select()
@@ -86,7 +86,7 @@ def sons():
 def father():
     
     if request.method == 'GET':
-        headers = ("id","ip","port","Description","Register Time","Last Update","Unregister Time")
+        headers = ("ID","IP","Port","Description","Register Time","Last Update","Unregister Time")
         try:
             print("[MANAGER_HIGH]:\tConsultando Resources em /father")
             resources = ManagerHighFather.select()
@@ -104,7 +104,7 @@ def father():
         print(ip)
         print(port)
         #print(row)
-        return redirect(f"https://{ip}:{port}")#temporario, arrumar para redirecionar  ## ARRUMAR
+        return redirect(f"http://{ip}:{port}")#temporario, arrumar para redirecionar  ## ARRUMAR
         
     
 

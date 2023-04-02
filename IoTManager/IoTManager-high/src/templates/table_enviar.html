@@ -6,7 +6,7 @@
         <title>Table</title>
         <link rel="stylesheet" href="/static/table.css" />
     </head>
-    <body>
+    <body style="font-family: Arial">
         <table calss="table">
             <tr class="table__header">
 
@@ -32,10 +32,14 @@
                     {% endfor %}
                     <td class="table__cell">
                         <input id="row" name="row"  type="hidden"  value="{{ row }}">
-                        <button type="submit" style="height:50%;">Enviar</button>
+
+                        <button  type="submit" class="button" style="vertical-align:middle"><span>OPEN</span>
+
+                        </button>
+
                     </td>
                 </form>
-            </tr>
+            </tr> 
             {% endfor %}
         </table>
     </body>
