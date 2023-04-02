@@ -3,7 +3,19 @@ import socket, requests, json
 from datetime import datetime
 from DBManagerHigh import ManagerHighFather, ManagerHighSons
 
-LOCAL_HOST = socket.gethostbyname(socket.gethostname())
+import psutil
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(('8.8.8.8', 80))
+my_eip = s.getsockname()[0]
+nics = psutil.net_if_addrs()
+my_enic = [i for i in nics for j in nics[i]
+           if j.address == my_eip and j.family == socket.AF_INET][0]
+print('\t\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
+    my_enic, my_eip))
+LOCAL_HOST = format(my_eip)
+s.disconnect()
+
 FORMAT = 'utf-8'
 
 IoTmaganer = Flask(__name__)
@@ -92,7 +104,7 @@ def father():
         print(ip)
         print(port)
         #print(row)
-        return redirect(url_for('father'))#temporario, arrumar para redirecionar  ## ARRUMAR
+        return redirect(f"https://{ip}:{port}")#temporario, arrumar para redirecionar  ## ARRUMAR
         
     
 
@@ -141,6 +153,7 @@ def setupfather():
 if __name__ == "__main__":
     portF = 9091
     hostF = "0.0.0.0"
+    print(f"\t\t\t\tThe port used is 9091")
     managerDescription = input("[MANAGER-HIGH]\tDescriçao do Manager High: ")
 
 

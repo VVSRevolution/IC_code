@@ -28,7 +28,7 @@ try:
         ManagerHighFather,
         ManagerHighSons    
     ])
-    print("[DATABASE_MANAGER-HIGH]:\t[OK] ao criar tabela")
+    print("[DATABASE_MANAGER-HIGH]:\t[OK] Database")
 except:
-    print("[DATABASE_MANAGER-HIGH]:\t[ERRO] ao criar tabela")
+    print("[DATABASE_MANAGER-HIGH]:\t[ERRO] Database")
 
