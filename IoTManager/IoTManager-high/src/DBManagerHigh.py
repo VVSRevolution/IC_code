@@ -23,10 +23,15 @@ class ManagerHighSons(BaseModel):
     description = peewee.TextField(default=None)
     registerTime = peewee.DateTimeField(default=datetime.now())
 
+class treeEndress(BaseModel):
+    name = peewee.TextField(default=None)
+    parent = peewee.TextField(default="")
+
 try:
     db.create_tables([
         ManagerHighFather,
-        ManagerHighSons    
+        ManagerHighSons,
+        treeEndress   
     ])
     print("[DATABASE_MANAGER-HIGH]:\t[OK] Database")
 except:

@@ -1,7 +1,7 @@
 from flask import *
 import socket, requests, json
 from datetime import datetime
-from DBManagerHigh import ManagerHighFather, ManagerHighSons
+from DBManagerHigh import ManagerHighFather, ManagerHighSons, treeEndress
 
 import psutil
 
@@ -11,7 +11,7 @@ my_eip = s.getsockname()[0]
 nics = psutil.net_if_addrs()
 my_enic = [i for i in nics for j in nics[i]
            if j.address == my_eip and j.family == socket.AF_INET][0]
-print('\t\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
+print('[MANAGER-HIGH]:\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
     my_enic, my_eip))
 LOCAL_HOST = format(my_eip)
 
@@ -22,8 +22,10 @@ IoTmaganer = Flask(__name__)
 
 @IoTmaganer.route('/',methods =['GET', 'POST', 'DELETE'])
 def IoTmanager():
+    localName = treeEndress.get()
+    fullLoc = f"{localName.parent}/{localName.name}"
     if request.method == 'GET':
-        return render_template("IoTManagerHigh.html")
+        return render_template("IoTManagerHigh.html",loc=fullLoc)
     if request.method == 'POST':
         headers= {'Content-type': 'application/json',}
 
@@ -34,6 +36,7 @@ def IoTmanager():
         ipFather = request.form.get("m_father_ip")
         portFather = request.form.get("m_father_port")
         descFather = request.form.get("m_father_desc") 
+
         print(f"[MANAGER_HIGH]:\tCadastrando {ipSon}:{portSon} ...")
         if(ipSon!= None and portSon!=None):
             managerdb = ManagerHighSons.create(
@@ -42,11 +45,13 @@ def IoTmanager():
                         description = descSon,
                         registerTime = datetime.now()
             )
+            
             print(f"[MANAGER_HIGH]:\tConectando com {ipSon}:{portSon} ... ")
             msg = {
                     "ip":LOCAL_HOST,
                     "port": portF,
-                    "description":managerDescription
+                    "description":managerDescription,
+                    "parentLoc": fullLoc
                 } 
             try:
                 requests.post (f'http://{ipSon}:{portSon}/setupfather', data = json.dumps(msg),headers=headers)
@@ -56,7 +61,7 @@ def IoTmanager():
 
         
 
-    return render_template("IoTManagerHigh.html")
+    return render_template("IoTManagerHigh.html", loc=fullLoc)
     
 
 @IoTmaganer.route('/sons',methods =['GET', 'POST'])
@@ -80,7 +85,7 @@ def sons():
         print(ip)
         print(port)
         #print(row)
-        return redirect(url_for('sons'))#temporario, arrumar para redirecionar  ## ARRUMAR
+        return redirect(f"http://{ip}:{port}")
 
 @IoTmaganer.route('/father',methods =['GET', 'POST'])  
 def father():
@@ -104,8 +109,7 @@ def father():
         print(ip)
         print(port)
         #print(row)
-        return redirect(f"http://{ip}:{port}")#temporario, arrumar para redirecionar  ## ARRUMAR
-        
+        return redirect(f"http://{ip}:{port}")
     
 
 @IoTmaganer.route('/setupfather',methods =['GET', 'POST', 'DELETE'])
@@ -117,8 +121,12 @@ def setupfather():
             ipFather = data["ip"]
             portFather = data["port"]
             descFather = data["description"]
-            
+            p_loc = data["parentLoc"]
+                        
             try:
+                loc = treeEndress.get()
+                loc.parent = p_loc
+                loc.save()
                 print("[MANAGER_HIGH]:\tUpdating Father")
                 query = ManagerHighFather.get()
                 if(query.ipManager == ipFather and query.portManager == portFather):
@@ -153,8 +161,19 @@ def setupfather():
 if __name__ == "__main__":
     portF = 9091
     hostF = "0.0.0.0"
-    print(f"\t\t\t\tThe port used is 9091")
-    managerDescription = input("[MANAGER-HIGH]\tDescriçao do Manager High: ")
+    print(f"\t\t\t\tThe port used is {portF}")
+    temp = input("\n[MANAGER-HIGH]:\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
+    if(temp != "" and temp.isdigit()):
+        portF = int(temp)
+        print(f"\t\t\t\tThe port used now is {portF}")
+    else:
+        print(f"\t\t\t\tThe port used is {portF}")
+    managerDescription = input("[MANAGER-HIGH]:\t\t\tDescriçao do Manager High: ")
+    treeLoc = input("[MANAGER-HIGH]:\t\t\tNome para localização na árvore: ")
+    treeEndress .create(
+        name = treeLoc
+    )
+    
 
 
     ####TEST##### remover
