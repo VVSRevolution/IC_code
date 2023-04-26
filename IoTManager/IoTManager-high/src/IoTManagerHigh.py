@@ -1,7 +1,9 @@
 from flask import *
 import socket, requests, json
 from datetime import datetime
-from DBManagerHigh import ManagerHighFather, ManagerHighSons, treeEndress
+from DBManagerHigh import *
+from playhouse.shortcuts import model_to_dict, dict_to_model
+
 
 import psutil
 
@@ -124,11 +126,16 @@ def setupfather():
             p_loc = data["parentLoc"]
                         
             try:
-                loc = treeEndress.get()
+                loc = treeEndress.get(treeEndress.id == 1)
                 loc.parent = p_loc
                 loc.save()
                 print("[MANAGER_HIGH]:\tUpdating Father")
-                query = ManagerHighFather.get()
+                
+                query = ManagerHighFather.get_or_create(
+                    ipManager = ipFather,
+                    portManager = portFather,
+                    description = descFather
+                )
                 if(query.ipManager == ipFather and query.portManager == portFather):
                     query.lastUpdateTime = datetime.now()
                     query.description = descFather
@@ -154,15 +161,53 @@ def setupfather():
             print(f"[MANAGER_HIGH]:\tERRO ao receber cadastro do Pai")
 
     return redirect(url_for('father'))
-        
+
+@IoTmaganer.route('/getfather',methods =['GET', 'POST', 'DELETE'])
+def getFather():
+    if request.method == 'GET':
+        headers= {'Content-type': 'application/json',}
+        data = []
+        query = ManagerHighFather.select().paginate(1, ManagerHighFather.select().count())
+        for i in query:
+            data.append(model_to_dict(i))
+        print(json.dumps(data, indent=4,sort_keys=True, default=str))
+
+        return json.dumps(data, indent=4, sort_keys=True, default=str)
+
+@IoTmaganer.route('/getsons',methods =['GET', 'POST', 'DELETE'])
+def getSons():
+    if request.method == 'GET':
+        headers= {'Content-type': 'application/json',}
+        data = []
+        query = ManagerHighSons.select().paginate(1, ManagerHighSons.select().count())
+        for i in query:
+            data.append(model_to_dict(i))
+        print(json.dumps(data, indent=4,sort_keys=True, default=str))
+
+        return json.dumps(data, indent=4, sort_keys=True, default=str)
+    
+@IoTmaganer.route('/gettree',methods =['GET', 'POST', 'DELETE'])
+def getTree():
+    if request.method == 'GET':
+        headers= {'Content-type': 'application/json',}
+        data = []
+        query = treeEndress.select().paginate(1, treeEndress.select().count())
+        for i in query:
+            data.append(model_to_dict(i))
+        print(json.dumps(data, indent=4,sort_keys=True, default=str))
+
+        return json.dumps(data, indent=4, sort_keys=True, default=str)
+
     
 
 
 if __name__ == "__main__":
+
     portF = 9091
     hostF = "0.0.0.0"
     print(f"\t\t\t\tThe port used is {portF}")
     temp = input("\n[MANAGER-HIGH]:\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
+
     if(temp != "" and temp.isdigit()):
         portF = int(temp)
         print(f"\t\t\t\tThe port used now is {portF}")
@@ -170,20 +215,23 @@ if __name__ == "__main__":
         print(f"\t\t\t\tThe port used is {portF}")
     managerDescription = input("[MANAGER-HIGH]:\t\t\tDescriçao do Manager High: ")
     treeLoc = input("[MANAGER-HIGH]:\t\t\tNome para localização na árvore: ")
-    treeEndress .create(
-        name = treeLoc
-    )
+
+    try:
+        query  = treeEndress.get(treeEndress.id == 1)
+        treeEndress.create(
+            name = query.name,
+            parent = query.parent,
+            registerTime = query.registerTime,
+            unregisterTime = datetime.now()
+        )
+        query.name = treeLoc
+        query.parent = ""
+        query.registerTime = datetime.now()
+        query.save()
+    except treeEndress.DoesNotExist:
+        query = treeEndress.create(name = treeLoc)
+
     
 
-
-    ####TEST##### remover
-    if False:
-        managerdb = ManagerHighSons.create(
-                            ipManager = LOCAL_HOST,
-                            portManager = portF,
-                            description = managerDescription,
-                            registerTime = datetime.now()
-        )
-    ####TEST end
     
     IoTmaganer.run(host = hostF, port = portF, debug=True, use_reloader=False)

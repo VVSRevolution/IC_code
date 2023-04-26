@@ -26,14 +26,17 @@ class ManagerHighSons(BaseModel):
 class treeEndress(BaseModel):
     name = peewee.TextField(default=None)
     parent = peewee.TextField(default="")
+    registerTime = peewee.DateTimeField(default=datetime.now())
+    unregisterTime = peewee.DateTimeField(null=True)
 
 try:
     db.create_tables([
         ManagerHighFather,
         ManagerHighSons,
-        treeEndress   
+        treeEndress
     ])
     print("[DATABASE_MANAGER-HIGH]:\t[OK] Database")
 except:
     print("[DATABASE_MANAGER-HIGH]:\t[ERRO] Database")
+
 
