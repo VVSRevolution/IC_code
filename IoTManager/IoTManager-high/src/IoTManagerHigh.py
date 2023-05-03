@@ -35,10 +35,6 @@ def IoTmanager():
         portSon = request.form.get("m_son_port")
         descSon = request.form.get("m_son_desc")
 
-        ipFather = request.form.get("m_father_ip")
-        portFather = request.form.get("m_father_port")
-        descFather = request.form.get("m_father_desc") 
-
         print(f"[MANAGER_HIGH]:\tCadastrando {ipSon}:{portSon} ...")
         if(ipSon!= None and portSon!=None):
             managerdb = ManagerHighSons.create(
@@ -162,7 +158,7 @@ def setupfather():
 
     return redirect(url_for('father'))
 
-@IoTmaganer.route('/getfather',methods =['GET', 'POST', 'DELETE'])
+@IoTmaganer.route('/allfather',methods =['GET','DELETE'])
 def getFather():
     if request.method == 'GET':
         headers= {'Content-type': 'application/json',}
@@ -173,8 +169,14 @@ def getFather():
         print(json.dumps(data, indent=4,sort_keys=True, default=str))
 
         return json.dumps(data, indent=4, sort_keys=True, default=str)
+    if request.method == 'DELETE':
+        query = ManagerHighFather.select().paginate(1, ManagerHighFather.select().count())
+        for i in query:
+            i.delete_instance()
+        return jsonify({"@message":"ALL DELETEDE"})
 
-@IoTmaganer.route('/getsons',methods =['GET', 'POST', 'DELETE'])
+
+@IoTmaganer.route('/allsons',methods =['GET','DELETE'])
 def getSons():
     if request.method == 'GET':
         headers= {'Content-type': 'application/json',}
@@ -185,8 +187,47 @@ def getSons():
         print(json.dumps(data, indent=4,sort_keys=True, default=str))
 
         return json.dumps(data, indent=4, sort_keys=True, default=str)
+    if request.method == 'DELETE':
+        query = ManagerHighSons.select().paginate(1, ManagerHighSons.select().count())
+        for i in query:
+            i.delete_instance()
+        return jsonify({"@message":"ALL DELETEDE"})
+
     
-@IoTmaganer.route('/gettree',methods =['GET', 'POST', 'DELETE'])
+@IoTmaganer.route('/son/<string:idd>',methods =['GET','DELETE'])
+def deleteSons(idd):
+    if request.method == 'GET':
+        try:
+            query = ManagerHighSons.select().where(ManagerHighSons.id == idd).get()
+            msg={
+                "id":query.id,
+                "ip":query.ipManager,
+                "port":query.portManager,
+                "descripition":query.description,
+                "registered":query.registerTime
+            }
+            return jsonify(msg)
+
+        except:
+            return jsonify({"@message":"ERROR"})
+    if request.method == 'DELETE':
+        try:
+            query = ManagerHighSons.select().where(ManagerHighSons.id == idd).get()
+            msg={
+                "@message":"DELETED",
+                "id":query.id,
+                "ip":query.ipManager,
+                "port":query.portManager,
+                "descripition":query.description,
+                "registered":query.registerTime
+            }
+            query.delete_instance()
+            return jsonify(msg)
+
+        except:
+            return jsonify({"@message":"ERROR"})
+    
+@IoTmaganer.route('/alltreehistory',methods =['GET','DELETE'])
 def getTree():
     if request.method == 'GET':
         headers= {'Content-type': 'application/json',}
@@ -198,8 +239,11 @@ def getTree():
 
         return json.dumps(data, indent=4, sort_keys=True, default=str)
 
-    
-
+    if request.method == 'DELETE':
+        query = treeEndress.select().paginate(1, treeEndress.select().count())
+        for i in query:
+            i.delete_instance()
+        return jsonify({"@message":"ALL DELETEDE"})
 
 if __name__ == "__main__":
 
