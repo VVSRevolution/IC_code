@@ -23,6 +23,10 @@
     background-color:rgb(235, 235, 235);
 }
 
+.table__cell:nth-last-child(-n+2):not(th){
+    background-color: white !important;
+}
+
 .table__header{
     padding: 8px;
     color:rgb(236, 236, 236);
@@ -30,7 +34,24 @@
     background-color:#464646;
     
 }
+
 .button {
+    display: inline-block;
+    border-radius: 0px;
+    background-color: #464646;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 18px;
+    padding: 5px;
+    min-height: equal to #table__row height;
+    width: 100px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 0px;
+}
+
+.delete-button {
     display: inline-block;
     border-radius: 0px;
     background-color: #464646;

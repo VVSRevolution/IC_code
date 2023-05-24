@@ -15,7 +15,7 @@
                 {% endfor %}
             </tr>
             {% for row in data.dicts() %}
-            <tr class="table__row">
+            <tr class="table__row formulario">
                 {{row[2]}}
                 <form method="post">
                     {% for cell in row %}
@@ -30,13 +30,17 @@
                             <input id="port" name="port"  type="hidden"  value="{{ row[cell] }}">
                         {% endif %}                    
                     {% endfor %}
-                    <td class="table__cell">
+
+                    <td class="table__cell white">
                         <input id="row" name="row"  type="hidden"  value="{{ row }}">
-
-                        <button  type="submit" class="button" style="vertical-align:middle"><span>OPEN</span>
-
+                        <button  type="submit" class="button" style="vertical-align:middle">
+                            <span>OPEN</span>
                         </button>
-
+                    </td>
+                    <td class="table__cell white">
+                        <button  type="submit" class="delete-button" style="vertical-align:middle">
+                            <span>DELETE</span>
+                        </button>
                     </td>
                 </form>
             </tr> 

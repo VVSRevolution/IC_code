@@ -14,3 +14,4 @@ paho_mqtt==1.6.1
 pyzmq==24.0.1
 requests==2.25.1
 Werkzeug==2.0.1
+psutil==5.9.5
