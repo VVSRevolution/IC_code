@@ -255,11 +255,10 @@ def getVirtualizers():
     fullLoc = "a/b/d"
     fullLoc = fullLoc.split("/")
 
-    add = request.get_data().decode('utf-8')
+    entrada = request.get_data().decode('utf-8')
 
-    print(f"\n\n\nENTRADA---------------------------------\n{type(add)}")
-    print(add)
-    add = add.split("/")
+    print(f"\n\n\nENTRADA---------------------------------\n")
+    add = entrada.split("/")
     print("-------------------------------------")
     print(add)
     print(fullLoc)
@@ -267,7 +266,13 @@ def getVirtualizers():
     print("-------------------------------------\n\n")
 
     if(len(fullLoc)>len(add)):
+        print("post")
+        pai = ManagerHighFather.get()
+        
+        requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
+        print("post")
         return "ir para o pai"
+        
     
     count = 0
     for i in range(len(fullLoc)):
@@ -281,11 +286,7 @@ def getVirtualizers():
         return f"ir para o filho {add[count]}"
     else:
         return "ir para o pai"
-    
 
-
-
-    return "200"
 
 #main
 if __name__ == "__main__":
