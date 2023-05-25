@@ -35,6 +35,8 @@ def IoTmanager():
         portSon = request.form.get("m_son_port")
         descSon = request.form.get("m_son_desc")
 
+        # tenho q atualisar a descrisao, pois nao recebe o nome atualisado do pai 
+
         print(f"[MANAGER_HIGH]:\tCadastrando {ipSon}:{portSon} ...")
         if(ipSon!= None and portSon!=None):
             managerdb = ManagerHighSons.create(
@@ -58,7 +60,7 @@ def IoTmanager():
                 print(f"[MANAGER_HIGH]:\tERRO ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\"")
 
         
-
+    #return fullLoc
     return render_template("IoTManagerHigh.html", loc=fullLoc)
     
 
@@ -173,7 +175,7 @@ def getFather():
         query = ManagerHighFather.select().paginate(1, ManagerHighFather.select().count())
         for i in query:
             i.delete_instance()
-        return jsonify({"@message":"ALL DELETEDE"})
+        return jsonify({"@message":"ALL DELETED"})
 
 
 @IoTmaganer.route('/allsons',methods =['GET','DELETE'])
@@ -191,7 +193,7 @@ def getSons():
         query = ManagerHighSons.select().paginate(1, ManagerHighSons.select().count())
         for i in query:
             i.delete_instance()
-        return jsonify({"@message":"ALL DELETEDE"})
+        return jsonify({"@message":"ALL DELETED"})
 
     
 @IoTmaganer.route('/son/<string:idd>',methods =['GET','DELETE'])
@@ -243,8 +245,49 @@ def getTree():
         query = treeEndress.select().paginate(1, treeEndress.select().count())
         for i in query:
             i.delete_instance()
-        return jsonify({"@message":"ALL DELETEDE"})
+        return jsonify({"@message":"ALL DELETED"})
 
+@IoTmaganer.route('/getVirtualizers',methods =['POST'])
+def getVirtualizers():
+    localName = treeEndress.get()
+    #curl http://172.24.219.147:9091/getVirtualizers -d "a/b/c/d/e"
+    fullLoc = f"{localName.parent}/{localName.name}"
+    fullLoc = "a/b/d"
+    fullLoc = fullLoc.split("/")
+
+    add = request.get_data().decode('utf-8')
+
+    print(f"\n\n\nENTRADA---------------------------------\n{type(add)}")
+    print(add)
+    add = add.split("/")
+    print("-------------------------------------")
+    print(add)
+    print(fullLoc)
+    print("-------------------------------------")
+    print("-------------------------------------\n\n")
+
+    if(len(fullLoc)>len(add)):
+        return "ir para o pai"
+    
+    count = 0
+    for i in range(len(fullLoc)):
+        if(fullLoc[i] == add[i]):
+            count=count+1
+        else:
+            break
+    print(f"Parrou no {count}")
+
+    if(count < len(add) and count == len(fullLoc)):
+        return f"ir para o filho {add[count]}"
+    else:
+        return "ir para o pai"
+    
+
+
+
+    return "200"
+
+#main
 if __name__ == "__main__":
 
     portF = 9091
