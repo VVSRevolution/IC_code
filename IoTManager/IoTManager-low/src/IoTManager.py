@@ -1,7 +1,7 @@
 from flask import *
 import socket, requests, json
 from datetime import datetime
-from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather
+from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather,treeEndress
 
 
 LOCAL_HOST = socket.gethostbyname(socket.gethostname())
@@ -189,10 +189,35 @@ def erro_m(erroMsg):
 if __name__ == "__main__":
     portF = 9000
     hostF = "0.0.0.0"
+    print(f"\t\t\t\tThe port used is {portF}")
+    temp = input("\n[MANAGER-HIGH]:\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
 
+    if(temp != "" and temp.isdigit()):
+        portF = int(temp)
+        print(f"\t\t\t\tThe port used now is {portF}")
+    else:
+        print(f"\t\t\t\tThe port used is {portF}")
+    
     managerdb = Manager.create(
                         ipManager = LOCAL_HOST,
                         portManager = portF,
                         registerTime = datetime.now()
     )
+    treeLoc = input("[MANAGER-HIGH]:\t\t\tNome para localização na árvore: ")
+
+    try:
+        query  = treeEndress.get(treeEndress.id == 1)
+        treeEndress.create(
+            name = query.name,
+            parent = query.parent,
+            registerTime = query.registerTime,
+            unregisterTime = datetime.now()
+        )
+        query.name = treeLoc
+        query.parent = ""
+        query.registerTime = datetime.now()
+        query.save()
+    except treeEndress.DoesNotExist:
+        query = treeEndress.create(name = treeLoc)
+
     IoTmaganer.run(host = hostF, port = portF, debug=True, use_reloader=False)

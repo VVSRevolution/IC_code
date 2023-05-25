@@ -14,7 +14,7 @@
         }
         .container {
             margin: 50px auto;
-            width: 800px;
+            width: 600px;
             padding: 20px;
             background-color: #fff;
             border-radius: 5px;
@@ -37,20 +37,23 @@
         }
         .form-group {
             margin-bottom: 20px;
+            padding-right: 20px;
+            padding-left: 20px;
         }
         .form-group label {
             display: block;
             margin-bottom: 5px;
+            
         }
         .form-group input[type="text"],
         .form-group button {
             padding: 10px;
             width: 100%;
             border: 1px solid #ccc;
-            border-radius: 5px;
+           
         }
         .form-group button {
-            background-color: #4CAF50;
+            background-color: #464646;
             color: #fff;
             cursor: pointer;
         }
@@ -63,7 +66,7 @@
         <div class="row">
             <div class="column">
                 <h3>Consultar ADDR:</h3>
-
+                
                 <div class="form-group">
                     <form action="/virtualizer">
                         <button>Virtualizer</button>
@@ -120,13 +123,14 @@
                         <input type="text" name="capabilite_description" placeholder="Description">
                         <input type="text" name="capabilite_capability_type" placeholder="Capability type">
                         <input type="text" name="capabilite_association" placeholder="Association">
+                        <br><br><br>
                         <button>Registrar</button>
                     </form>
                 </div>
             </div>
 
             <div class="column">
-                <h3>Registrar no Virtualizer:</h3>
+                <h3><br></h3>
                 <div class="form-group">
                     <label>Recurso:</label>
                     <form method="post">

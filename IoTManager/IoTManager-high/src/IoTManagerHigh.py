@@ -252,18 +252,11 @@ def getVirtualizers():
     localName = treeEndress.get()
     #curl http://172.24.219.147:9091/getVirtualizers -d "a/b/c/d/e"
     fullLoc = f"{localName.parent}/{localName.name}"
-    fullLoc = "a/b/d"
+    #fullLoc = "a/b/d"
     fullLoc = fullLoc.split("/")
 
     entrada = request.get_data().decode('utf-8')
-
-    print(f"\n\n\nENTRADA---------------------------------\n")
     add = entrada.split("/")
-    print("-------------------------------------")
-    print(add)
-    print(fullLoc)
-    print("-------------------------------------")
-    print("-------------------------------------\n\n")
 
     if(len(fullLoc)>len(add)):
         print("post")

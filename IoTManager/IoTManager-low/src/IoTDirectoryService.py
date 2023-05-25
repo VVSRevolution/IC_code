@@ -34,6 +34,11 @@ class ManagerFather(BaseModel):
     registerTime = peewee.DateTimeField(default=datetime.now())
     lastUpdateTime = peewee.DateTimeField(null=True)
     unregisterTime = peewee.DateTimeField(null=True)
+class treeEndress(BaseModel):
+    name = peewee.TextField(default=None)
+    parent = peewee.TextField(default="")
+    registerTime = peewee.DateTimeField(default=datetime.now())
+    unregisterTime = peewee.DateTimeField(null=True)
 
 
 try:
@@ -41,7 +46,8 @@ try:
         Virtualizer,
         Gateway,
         Manager,
-        ManagerFather   
+        ManagerFather,
+        treeEndress  
     ])
     print("[DATABASE]:\t[OK] ao criar tabela")
 except:

@@ -67,6 +67,10 @@
     margin: 0px;
 }
 
+.delete-button:hover{
+    background-color:rgb(121, 0, 0);
+}
+
 .button span {
     cursor: pointer;
     display: inline-block;
