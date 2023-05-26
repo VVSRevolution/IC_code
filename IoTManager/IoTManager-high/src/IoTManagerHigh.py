@@ -105,10 +105,6 @@ def father():
         port = request.form.get('port')
         ip = request.form.get('ip')
         row = request.form.get('row')
-        print(id)
-        print(ip)
-        print(port)
-        #print(row)
         return redirect(f"http://{ip}:{port}")
     
 

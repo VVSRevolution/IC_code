@@ -63,84 +63,149 @@ def IoTmanager():
         
     return render_template("IoTmanager.html")
 
-@IoTmaganer.route('/virtualizer')
+@IoTmaganer.route('/virtualizer',methods =['GET', 'POST'])
 def virtualizer():
-    headers = ("id","ipVirtualizer","portVirtualizer","registerTime")
-    try:
-        print("[MANAGER]:\tConsultando Resources em /virtualizer")
-        resources = Virtualizer.select()
-    except:
-        print("[MANAGER]:\tERRO no processo de consulta do Resource em /virtualizer")
-    else:
-        return render_template("table.html", headings=headers, data=resources)
-
-@IoTmaganer.route('/gateway')
+    if request.method == 'GET':
+        headers = ("id","ipVirtualizer","portVirtualizer","registerTime")
+        try:
+            print("[MANAGER]:\tConsultando Resources em /virtualizer")
+            resources = Virtualizer.select()
+        except:
+            print("[MANAGER]:\tERRO no processo de consulta do Resource em /virtualizer")
+        else:
+            return render_template("table.html", headings=headers, data=resources)
+    if request.method == 'POST':
+        id = request.form.get('id')
+        port = request.form.get('port')
+        ip = request.form.get('ip')
+        row = request.form.get('row')
+        return redirect(f"http://{ip}:{port}")
+    
+@IoTmaganer.route('/gateway',methods =['GET', 'POST'])
 def gateway():
-    headers = ("id","ipGateway","portGateway","registerTime")
-    try:
-        print("[MANAGER]:\tConsultando Resources em /gateway")
-        resources = Gateway.select()
-    except:   
-        print("[MANAGER]:\tERRO no processo de consulta do Resource em /gateway")
-    else:
-        return render_template("table.html", headings=headers, data=resources)
+    if request.method == 'GET':
+        headers = ("id","ipGateway","portGateway","registerTime")
+        try:
+            print("[MANAGER]:\tConsultando Resources em /gateway")
+            resources = Gateway.select()
+        except:   
+            print("[MANAGER]:\tERRO no processo de consulta do Resource em /gateway")
+        else:
+            return render_template("table.html", headings=headers, data=resources)
+    if request.method == 'POST':
+        id = request.form.get('id')
+        port = request.form.get('port')
+        ip = request.form.get('ip')
+        row = request.form.get('row')
+        return redirect(f"http://{ip}:{port}")
+    
 
-
-@IoTmaganer.route('/manager')
+@IoTmaganer.route('/manager',methods =['GET', 'POST'])
 def manager():
-    headers = ("id","ipManager","portManager","registerTime")
-    try:
-        print("[MANAGER]:\tConsultando Resources em /manager")
-        resources = Manager.select()
-    except:
-        print("[MANAGER]:\tERRO no processo de consulta do Resource em /manager")
-    else:
-        return render_template("table.html", headings=headers, data=resources)
-
-
-@IoTmaganer.route('/virtualizer/<string:host>')
-def virtualizer_uuid(host):
-    try:
-        exit = f"<h1>Virtualizador ({host})</h1> <div style=\"float:left;padding: 10px;\"><h3>Resources:</h3>"
-        host = f"http://{host}"
-        r = requests.get(url = f"{host}/resources")
-        exit +=r.text
-        exit += "</div><div style=\"float:left;padding: 10px;\"><h3>Capabilites:</h3>"
-        r = requests.get(url = f"{host}/capabilities")
-        exit +=r.text
-        exit += "</div><div style=\"float:left;padding: 10px;\"><h3>Realsensors:</h3>"
-        r = requests.get(url = f"{host}/realsensors")
-        exit +=r.text
-        exit += "</div><div style=\"float:left;padding: 10px;\"><h3>Data:</h3>"
-        r = requests.get(url = f"{host}/data")
-        exit +=r.text
-        return exit
-    except:
-        return f"<h1>ERRO:</h1> <h2>Virtualizador ({host}) não existe ou esta offline</h2>"
-
-@IoTmaganer.route('/gateway/<string:host>')
-def gateway_uuid(host):
-    try:
-        exit = f"<h1>Gateway ({host})</h1> <div style=\"float:left;padding: 10px;\"><h3>Sensor:</h3>"
-        host = f"http://{host}"
-        r = requests.get(url = f"{host}/resources")
-        exit +=r.text
-        return exit
-    except:
-        return f"<h1>ERRO:</h1> <h2>Virtualizador ({host}) não existe ou esta offline</h2>"
+    if request.method == 'GET':
+        headers = ("id","ipManager","portManager","registerTime")
+        try:
+            print("[MANAGER]:\tConsultando Resources em /manager")
+            resources = Manager.select()
+        except:
+            print("[MANAGER]:\tERRO no processo de consulta do Resource em /manager")
+        else:
+            return render_template("table.html", headings=headers, data=resources)
+    if request.method == 'POST':
+        id = request.form.get('id')
+        port = request.form.get('port')
+        ip = request.form.get('ip')
+        row = request.form.get('row')
+        return redirect(f"http://{ip}:{port}")
     
-@IoTmaganer.route('/father')  
+@IoTmaganer.route('/father',methods =['GET', 'POST'])  
 def father():
-    headers = ("id","IpManager","PortManager","Description","Register Time","Last Update","Unregister Time")
-    try:
-        print("[MANAGER_HIGH]:\tConsultando Resources em /father")
-        resources = ManagerFather.select()
-    except:
-        print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /father")
-    else:
-        return render_template("table.html", headings=headers, data=resources)
+    if request.method == 'GET':
+
+        headers = ("id","IpManager","PortManager","Description","Register Time","Last Update","Unregister Time")
+        try:
+            print("[MANAGER_HIGH]:\tConsultando Resources em /father")
+            resources = ManagerFather.select()
+        except:
+            print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /father")
+        else:
+            return render_template("table.html", headings=headers, data=resources)
+    if request.method == 'POST':
+        id = request.form.get('id')
+        port = request.form.get('port')
+        ip = request.form.get('ip')
+        row = request.form.get('row')
+        return redirect(f"http://{ip}:{port}")
     
+@IoTmaganer.route('/virtualizer/<string:host>',methods =['GET','DELETE'])
+def virtualizer_uuid(host):
+    if request.method == 'GET':
+        try:
+            exit = f"<h1>Virtualizador ({host})</h1> <div style=\"float:left;padding: 10px;\"><h3>Resources:</h3>"
+            host = f"http://{host}"
+            r = requests.get(url = f"{host}/resources")
+            exit +=r.text
+            exit += "</div><div style=\"float:left;padding: 10px;\"><h3>Capabilites:</h3>"
+            r = requests.get(url = f"{host}/capabilities")
+            exit +=r.text
+            exit += "</div><div style=\"float:left;padding: 10px;\"><h3>Realsensors:</h3>"
+            r = requests.get(url = f"{host}/realsensors")
+            exit +=r.text
+            exit += "</div><div style=\"float:left;padding: 10px;\"><h3>Data:</h3>"
+            r = requests.get(url = f"{host}/data")
+            exit +=r.text
+            return exit
+        except:
+            return f"<h1>ERRO:</h1> <h2>Virtualizador ({host}) não existe ou esta offline</h2>"
+    if request.method == 'DELETE':
+        try:
+            hostT = host.split(":")
+            query = Virtualizer.select().where(Virtualizer.ipVirtualizer == hostT[0],Virtualizer.portVirtualizer ==hostT[1]).get()
+            msg={
+                "@message":"DELETED",
+                "id":query.id,
+                "ip":query.ipVirtualizer,
+                "port":query.portVirtualizer,
+                "registered":query.registerTime
+            }
+            query.delete_instance()
+            return jsonify(msg)
+
+        except:
+            return jsonify({"@message":"ERROR"})
     
+
+@IoTmaganer.route('/gateway/<string:host>', methods =['GET','DELETE'])
+def gateway_uuid(host):
+    if request.method == 'GET':
+        try:
+            exit = f"<h1>Gateway ({host})</h1> <div style=\"float:left;padding: 10px;\"><h3>Sensor:</h3>"
+            host = f"http://{host}"
+            r = requests.get(url = f"{host}/resources")
+            exit +=r.text
+            return exit
+        except:
+            return f"<h1>ERRO:</h1> <h2>Virtualizador ({host}) não existe ou esta offline</h2>"
+    
+    if request.method == 'DELETE':
+        try:
+            hostT = host.split(":")
+            query = Gateway.select().where(Gateway.ipGateway == hostT[0],Gateway.portGateway ==hostT[1]).get()
+            msg={
+                "@message":"DELETED",
+                "id":query.id,
+                "ip":query.ipGateway,
+                "port":query.portGateway,
+                "registered":query.registerTime
+            }
+            query.delete_instance()
+            return jsonify(msg)
+
+        except:
+            return jsonify({"@message":"ERROR"})
+    
+
+        
 @IoTmaganer.route('/setupfather',methods =['GET', 'POST', 'DELETE'])
 def setupfather():
     if request.method == 'POST':
