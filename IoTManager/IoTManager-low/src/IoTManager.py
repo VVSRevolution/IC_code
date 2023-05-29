@@ -2,9 +2,22 @@ from flask import *
 import socket, requests, json
 from datetime import datetime
 from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather,treeEndress
+from playhouse.shortcuts import model_to_dict, dict_to_model
 
 
-LOCAL_HOST = socket.gethostbyname(socket.gethostname())
+
+import psutil
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(('8.8.8.8', 80))
+my_eip = s.getsockname()[0]
+nics = psutil.net_if_addrs()
+my_enic = [i for i in nics for j in nics[i]
+           if j.address == my_eip and j.family == socket.AF_INET][0]
+print('[MANAGER-HIGH]:\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
+    my_enic, my_eip))
+LOCAL_HOST = format(my_eip)
+
 FORMAT = 'utf-8'
 
 IoTmaganer = Flask(__name__)
@@ -74,13 +87,7 @@ def virtualizer():
             print("[MANAGER]:\tERRO no processo de consulta do Resource em /virtualizer")
         else:
             return render_template("table.html", headings=headers, data=resources)
-    if request.method == 'POST':
-        id = request.form.get('id')
-        port = request.form.get('port')
-        ip = request.form.get('ip')
-        row = request.form.get('row')
-        return redirect(f"http://{ip}:{port}")
-    
+
 @IoTmaganer.route('/gateway',methods =['GET', 'POST'])
 def gateway():
     if request.method == 'GET':
@@ -136,6 +143,25 @@ def father():
         ip = request.form.get('ip')
         row = request.form.get('row')
         return redirect(f"http://{ip}:{port}")
+    
+@IoTmaganer.route('/allfather',methods =['GET','DELETE'])
+def getFather():
+    if request.method == 'GET':
+        headers= {'Content-type': 'application/json',}
+        data = []
+        query = ManagerFather.select().paginate(1, ManagerFather.select().count())
+        for i in query:
+            data.append(model_to_dict(i))
+        print(json.dumps(data, indent=4,sort_keys=True, default=str))
+
+        return json.dumps(data, indent=4, sort_keys=True, default=str)
+    if request.method == 'DELETE':
+        query = ManagerFather.select().paginate(1, ManagerFather.select().count())
+        for i in query:
+            i.delete_instance()
+        return jsonify({"@message":"ALL DELETED"})
+
+
     
 @IoTmaganer.route('/virtualizer/<string:host>',methods =['GET','DELETE'])
 def virtualizer_uuid(host):

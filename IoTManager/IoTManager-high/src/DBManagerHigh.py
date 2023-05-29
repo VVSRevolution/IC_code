@@ -21,6 +21,7 @@ class ManagerHighSons(BaseModel):
     ipManager = peewee.TextField(default=None)
     portManager = peewee.TextField(default=None)
     description = peewee.TextField(default=None)
+    nameinTree = peewee.TextField(default=None)
     registerTime = peewee.DateTimeField(default=datetime.now())
 
 class treeEndress(BaseModel):

@@ -3,6 +3,7 @@ import socket, requests, json
 from datetime import datetime
 from DBManagerHigh import *
 from playhouse.shortcuts import model_to_dict, dict_to_model
+import sys, os
 
 
 import psutil
@@ -39,12 +40,6 @@ def IoTmanager():
 
         print(f"[MANAGER_HIGH]:\tCadastrando {ipSon}:{portSon} ...")
         if(ipSon!= None and portSon!=None):
-            managerdb = ManagerHighSons.create(
-                        ipManager = ipSon,
-                        portManager = portSon,
-                        description = descSon,
-                        registerTime = datetime.now()
-            )
             
             print(f"[MANAGER_HIGH]:\tConectando com {ipSon}:{portSon} ... ")
             msg = {
@@ -54,8 +49,20 @@ def IoTmanager():
                     "parentLoc": fullLoc
                 } 
             try:
-                requests.post (f'http://{ipSon}:{portSon}/setupfather', data = json.dumps(msg),headers=headers)
-                print(f"[MANAGER_HIGH]:\tPOST \"http://{ipSon}:{portSon}/setupfather\" realizado")
+                respose = requests.post (f'http://{ipSon}:{portSon}/setupfather', data = json.dumps(msg),headers=headers)
+                print(f"Retorno = {respose.text}")
+                if(respose.text != "@erro404"):
+                    print(f"[MANAGER_HIGH]:\tPOST \"http://{ipSon}:{portSon}/setupfather\" realizado")
+                    managerdb = ManagerHighSons.create(
+                            ipManager = ipSon,
+                            portManager = portSon,
+                            description = descSon,
+                            nameinTree = respose.text,
+                            registerTime = datetime.now()
+                    )
+                else:
+                    print(f"[MANAGER_HIGH]:\tERRO ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\"")
+
             except:
                 print(f"[MANAGER_HIGH]:\tERRO ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\"")
 
@@ -67,7 +74,7 @@ def IoTmanager():
 @IoTmaganer.route('/sons',methods =['GET', 'POST'])
 def sons():
     if request.method == 'GET':
-        headers = ("ID","IP","Port","Description","RegisterTime")
+        headers = ("ID","IP","Port","Description","Nome na árvore","RegisterTime")
         try:
             print("[MANAGER_HIGH]:\tConsultando Resources em /sons")
             resources = ManagerHighSons.select()
@@ -125,12 +132,19 @@ def setupfather():
                 loc.save()
                 print("[MANAGER_HIGH]:\tUpdating Father")
                 
-                query = ManagerHighFather.get_or_create(
-                    ipManager = ipFather,
-                    portManager = portFather,
-                    description = descFather
-                )
-                if(query.ipManager == ipFather and query.portManager == portFather):
+                try:
+                    query = ManagerHighFather.get(
+                            (ManagerHighFather.ipManager == ipFather) and
+                            (ManagerHighFather.portManager == portFather)
+                        )
+                except ManagerHighFather.DoesNotExist:
+                    query = ManagerHighFather.create(
+                        ipManager = ipFather,
+                        portManager = portFather
+                    )
+                
+                if(query.ipManager == ipFather and query.portManager == str(portFather)):
+                    query.description = descFather
                     query.lastUpdateTime = datetime.now()
                     query.description = descFather
                 else:
@@ -139,7 +153,7 @@ def setupfather():
                         portManager = query.portManager,
                         description = query.description,
                         registerTime = query.registerTime,
-                        lastUpdateTime = query.lastUpdateTime,
+                        lastUpdateTime = query.lasuttUpdateTime,
                         unregisterTime = datetime.now()
                     )
                     query.ipManager = ipFather
@@ -147,14 +161,21 @@ def setupfather():
                     query.description = descFather
                     query.lastUpdateTime = None
                     query.registerTime = datetime.now()
-                    query.save()
-            except:
-                print("[MANAGER_HIGH]:\tERRO ao atualizar Father")
+                query.save()
+                localName = treeEndress.get()
+                print(f"mandando repouse = {localName.name}")
+                return localName.name
+            except Exception as error:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
 
+                print("[MANAGER_HIGH]:\tERRO ao atualizar Father", error)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)    
         except:
             print(f"[MANAGER_HIGH]:\tERRO ao receber cadastro do Pai")
 
-    return redirect(url_for('father'))
+    return "@erro404"
 
 @IoTmaganer.route('/allfather',methods =['GET','DELETE'])
 def getFather():
