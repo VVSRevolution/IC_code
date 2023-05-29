@@ -3,8 +3,7 @@ import socket, requests, json
 from datetime import datetime
 from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather,treeAddress
 from playhouse.shortcuts import model_to_dict, dict_to_model
-
-
+import sys, os
 
 import psutil
 
@@ -23,8 +22,10 @@ FORMAT = 'utf-8'
 IoTmaganer = Flask(__name__)
 @IoTmaganer.route('/',methods =['GET', 'POST', 'DELETE'])
 def IoTmanager():
+    localName = treeAddress.get()
+    fullLoc = f"{localName.parent}/{localName.name}"
     if request.method == 'GET':
-        return render_template("IoTmanager.html")
+        return render_template("IoTManager.html", loc=fullLoc)
     if request.method == 'POST':
 
     # Consultar Dados
@@ -241,35 +242,59 @@ def setupfather():
             ipFather = data["ip"]
             portFather = data["port"]
             descFather = data["description"]
-            
+            p_loc = data["parentLoc"]
+                        
             try:
+                loc = treeAddress.get(treeAddress.id == 1)
+                loc.parent = p_loc
+                loc.save()
                 print("[MANAGER_HIGH]:\tUpdating Father")
-                query = ManagerFather.get()
-                if(query.ipManager == ipFather and query.portManager == portFather):
-                    query.lastUpdateTime = datetime.now()
-                    query.description = descFather
-                else:
-                    managerdb = ManagerFather.create(
-                        ipManager = query.ipManager,
-                        portManager = query.portManager,
-                        description = query.description,
-                        registerTime = query.registerTime,
-                        lastUpdateTime = query.lastUpdateTime,
-                        unregisterTime = datetime.now()
+                
+                try:
+                    query = ManagerFather.get(
+                            (ManagerFather.ipManager == ipFather) and
+                            (ManagerFather.portManager == portFather)
+                        )
+                except ManagerFather.DoesNotExist:
+                    query = ManagerFather.create(
+                        ipManager = ipFather,
+                        portManager = portFather,
+                        description = descFather
                     )
-                    query.ipManager = ipFather
-                    query.portManager = portFather
-                    query.description = descFather
-                    query.lastUpdateTime = None
-                    query.registerTime = datetime.now()
-                    query.save()
-            except:
-                print("[MANAGER_HIGH]:\tERRO ao atualizar Father")
+                else:
+                    if(query.ipManager == ipFather and query.portManager == str(portFather)):
+                        query.description = descFather
+                        query.lastUpdateTime = datetime.now()
+                        query.description = descFather
+                    else:
+                        managerdb = ManagerFather.create(
+                            ipManager = query.ipManager,
+                            portManager = query.portManager,
+                            description = query.description,
+                            registerTime = query.registerTime,
+                            lastUpdateTime = query.lasuttUpdateTime,
+                            unregisterTime = datetime.now()
+                        )
+                        query.ipManager = ipFather
+                        query.portManager = portFather
+                        query.description = descFather
+                        query.lastUpdateTime = None
+                        query.registerTime = datetime.now()
+                        query.save()
+                localName = treeAddress.get()
+                print(f"mandando repouse = {localName.name}")
+                return localName.name
+            except Exception as error:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
 
+                print("[MANAGER_HIGH]:\tERRO ao atualizar Father", error)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)    
         except:
             print(f"[MANAGER_HIGH]:\tERRO ao receber cadastro do Pai")
 
-    return redirect(url_for('father'))
+    return "@erro404"
 
 @IoTmaganer.route('/erro')
 def erro_m(erroMsg):
@@ -300,7 +325,7 @@ def search():
 
     if request.method == 'POST':
         localName = treeAddress.get()
-        #curl http://172.24.219.147:9091/getVirtualizers -d "a/b/c/d/e"
+        #curl http://172.23.50.213:9002/search -d "A/C"
         fullLoc = f"{localName.parent}/{localName.name}"
         #fullLoc = "a/b/d"
         fullLoc = fullLoc.split("/")

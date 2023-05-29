@@ -49,7 +49,7 @@ def IoTmanager():
                     "parentLoc": fullLoc
                 } 
             try:
-                respose = requests.post (f'http://{ipSon}:{portSon}/setupfather', data = json.dumps(msg),headers=headers)
+                respose = requests.post (f"http://{ipSon}:{portSon}/setupfather", data = json.dumps(msg),headers=headers)
                 print(f"Retorno = {respose.text}")
                 if(respose.text != "@erro404"):
                     print(f"[MANAGER_HIGH]:\tPOST \"http://{ipSon}:{portSon}/setupfather\" realizado")
@@ -61,10 +61,15 @@ def IoTmanager():
                             registerTime = datetime.now()
                     )
                 else:
-                    print(f"[MANAGER_HIGH]:\tERRO ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\"")
+                    print(f"[MANAGER_HIGH]:\tERRO 002 ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\"")
 
-            except:
-                print(f"[MANAGER_HIGH]:\tERRO ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\"")
+            except Exception as error:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+
+                print(f"[MANAGER_HIGH]:\tERRO 001 ao cadastrando Filho em: \"http://{ipSon}:{portSon}/setupfather\":",error)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)    
 
         
     #return fullLoc
@@ -267,7 +272,7 @@ def getTree():
 @IoTmaganer.route('/search',methods =['POST'])
 def search():
     localName = treeEndress.get()
-    #curl http://172.24.219.147:9091/getVirtualizers -d "a/b/c/d/e"
+    #curl http://172.23.50.213:9091/getVirtualizers -d "A/B/C"
     fullLoc = f"{localName.parent}/{localName.name}"
     #fullLoc = "a/b/d"
     fullLoc = fullLoc.split("/")
