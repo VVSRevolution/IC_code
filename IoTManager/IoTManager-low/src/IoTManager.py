@@ -1,7 +1,7 @@
 from flask import *
 import socket, requests, json
 from datetime import datetime
-from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather,treeEndress
+from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather,treeAddress
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
 
@@ -235,7 +235,6 @@ def gateway_uuid(host):
 @IoTmaganer.route('/setupfather',methods =['GET', 'POST', 'DELETE'])
 def setupfather():
     if request.method == 'POST':
-
         try:
             data = request.get_json()
 
@@ -277,6 +276,67 @@ def erro_m(erroMsg):
     erroMsg = "<h1>ERRO</h1>"
     return erroMsg
 
+@IoTmaganer.route('/search',methods =['POST','GET'])
+def search():
+    if request.method == 'GET':
+        virtualizers = []
+        gateways = []
+        query = Virtualizer.select().paginate(1, Virtualizer.select().count())
+        for i in query:
+            virtualizers.append(model_to_dict(i))
+        query = Gateway.select().paginate(1, Gateway.select().count())
+        for i in query:
+            gateways.append(model_to_dict(i))
+        localName = treeAddress.get()
+        fullLoc = f"{localName.parent}/{localName.name}"
+        response = {
+            "Manager address": fullLoc,
+            "Virtualizers": [virtualizers],
+            "Gateways": [gateways]
+        }
+
+        print(json.dumps(response, indent=4, sort_keys=True, default=str))
+        return json.dumps(response, indent=4, sort_keys=True, default=str)
+
+    if request.method == 'POST':
+        localName = treeAddress.get()
+        #curl http://172.24.219.147:9091/getVirtualizers -d "a/b/c/d/e"
+        fullLoc = f"{localName.parent}/{localName.name}"
+        #fullLoc = "a/b/d"
+        fullLoc = fullLoc.split("/")
+
+        entrada = request.get_data().decode('utf-8')
+        add = entrada.split("/")
+
+        if(fullLoc == add):
+            virtualizers = []
+            gateways = []
+            query = Virtualizer.select().paginate(1, Virtualizer.select().count())
+            for i in query:
+                virtualizers.append(model_to_dict(i))
+            query = Gateway.select().paginate(1, Gateway.select().count())
+            for i in query:
+                gateways.append(model_to_dict(i))
+
+            localName = treeAddress.get()
+            fullLoc = f"{localName.parent}/{localName.name}"
+            response = {
+                "Manager address": fullLoc,
+                "Virtualizers": [virtualizers],
+                "Gateways": [gateways]
+            }
+            print(json.dumps(response, indent=4, sort_keys=True, default=str))
+            return json.dumps(response, indent=4, sort_keys=True, default=str)
+
+
+    else:
+        pai = ManagerFather.get(ManagerFather.id == 1)
+        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
+        return response
+        
+
+
+
 if __name__ == "__main__":
     portF = 9000
     hostF = "0.0.0.0"
@@ -297,8 +357,8 @@ if __name__ == "__main__":
     treeLoc = input("[MANAGER-HIGH]:\t\t\tNome para localização na árvore: ")
 
     try:
-        query  = treeEndress.get(treeEndress.id == 1)
-        treeEndress.create(
+        query  = treeAddress.get(treeAddress.id == 1)
+        treeAddress.create(
             name = query.name,
             parent = query.parent,
             registerTime = query.registerTime,
@@ -308,7 +368,7 @@ if __name__ == "__main__":
         query.parent = ""
         query.registerTime = datetime.now()
         query.save()
-    except treeEndress.DoesNotExist:
-        query = treeEndress.create(name = treeLoc)
+    except treeAddress.DoesNotExist:
+        query = treeAddress.create(name = treeLoc)
 
     IoTmaganer.run(host = hostF, port = portF, debug=True, use_reloader=False)

@@ -264,8 +264,8 @@ def getTree():
             i.delete_instance()
         return jsonify({"@message":"ALL DELETED"})
 
-@IoTmaganer.route('/getVirtualizers',methods =['POST'])
-def getVirtualizers():
+@IoTmaganer.route('/search',methods =['POST'])
+def search():
     localName = treeEndress.get()
     #curl http://172.24.219.147:9091/getVirtualizers -d "a/b/c/d/e"
     fullLoc = f"{localName.parent}/{localName.name}"
@@ -277,11 +277,10 @@ def getVirtualizers():
 
     if(len(fullLoc)>len(add)):
         print("post")
-        pai = ManagerHighFather.get()
-        
-        requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
+        pai = ManagerHighFather.get(ManagerHighFather.id == 1)
+        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
         print("post")
-        return "ir para o pai"
+        return response
         
     
     count = 0
@@ -293,9 +292,14 @@ def getVirtualizers():
     print(f"Parrou no {count}")
 
     if(count < len(add) and count == len(fullLoc)):
-        return f"ir para o filho {add[count]}"
+        filho = ManagerHighSons.get(ManagerHighSons.nameinTree == add[count])
+        response = requests.post (f'http://{filho.ipManager}:{filho.portManager}/getVirtualizers', data = entrada)
+
+        return response
     else:
-        return "ir para o pai"
+        pai = ManagerHighFather.get(ManagerHighFather.id == 1)
+        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
+        return response
 
 
 #main
