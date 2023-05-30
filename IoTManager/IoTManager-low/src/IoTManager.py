@@ -252,8 +252,7 @@ def setupfather():
                 
                 try:
                     query = ManagerFather.get(
-                            (ManagerFather.ipManager == ipFather) and
-                            (ManagerFather.portManager == portFather)
+                            (ManagerFather.id == 1)
                         )
                 except ManagerFather.DoesNotExist:
                     query = ManagerFather.create(
@@ -325,7 +324,7 @@ def search():
 
     if request.method == 'POST':
         localName = treeAddress.get()
-        #curl http://172.23.50.213:9002/search -d "A/C"
+        #curl http://172.28.148.165:9002/search -d "/A/C"
         fullLoc = f"{localName.parent}/{localName.name}"
         #fullLoc = "a/b/d"
         fullLoc = fullLoc.split("/")
@@ -334,6 +333,7 @@ def search():
         add = entrada.split("/")
 
         if(fullLoc == add):
+            print(f"{fullLoc} == {add}")
             virtualizers = []
             gateways = []
             query = Virtualizer.select().paginate(1, Virtualizer.select().count())
@@ -347,17 +347,17 @@ def search():
             fullLoc = f"{localName.parent}/{localName.name}"
             response = {
                 "Manager address": fullLoc,
-                "Virtualizers": [virtualizers],
-                "Gateways": [gateways]
+                "Virtualizers": virtualizers,
+                "Gateways": gateways
             }
             print(json.dumps(response, indent=4, sort_keys=True, default=str))
             return json.dumps(response, indent=4, sort_keys=True, default=str)
-
-
-    else:
-        pai = ManagerFather.get(ManagerFather.id == 1)
-        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
-        return response
+        else:
+            print(f"{fullLoc} != {add}")
+            pai = ManagerFather.get(ManagerFather.id == 1)
+            print(f'POST http://{pai.ipManager}:{pai.portManager}/search -d {entrada}')
+            response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/search', data = entrada)
+            return response
         
 
 

@@ -283,7 +283,8 @@ def search():
     if(len(fullLoc)>len(add)):
         print("post")
         pai = ManagerHighFather.get(ManagerHighFather.id == 1)
-        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
+        print(f'POST http://{pai.ipManager}:{pai.portManager}/search -d {entrada}')
+        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/search', data = entrada)
         print("post")
         return response
         
@@ -298,12 +299,14 @@ def search():
 
     if(count < len(add) and count == len(fullLoc)):
         filho = ManagerHighSons.get(ManagerHighSons.nameinTree == add[count])
-        response = requests.post (f'http://{filho.ipManager}:{filho.portManager}/getVirtualizers', data = entrada)
+        print(f'POST http://{filho.ipManager}:{filho.portManager}/search -d {entrada}')
+        response = requests.post (f'http://{filho.ipManager}:{filho.portManager}/search', data = entrada)
 
         return response
     else:
         pai = ManagerHighFather.get(ManagerHighFather.id == 1)
-        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/getVirtualizers', data = entrada)
+        print(f'POST http://{pai.ipManager}:{pai.portManager}/search -d {entrada}')
+        response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/search', data = entrada)
         return response
 
 
