@@ -286,6 +286,7 @@ def search():
         print(f'POST http://{pai.ipManager}:{pai.portManager}/search -d {entrada}')
         response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/search', data = entrada)
         print("post")
+        response = Response(response, content_type='application/json')
         return response
         
     
@@ -302,11 +303,13 @@ def search():
         print(f'POST http://{filho.ipManager}:{filho.portManager}/search -d {entrada}')
         response = requests.post (f'http://{filho.ipManager}:{filho.portManager}/search', data = entrada)
 
+        response = Response(response, content_type='application/json')
         return response
     else:
         pai = ManagerHighFather.get(ManagerHighFather.id == 1)
         print(f'POST http://{pai.ipManager}:{pai.portManager}/search -d {entrada}')
         response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/search', data = entrada)
+        response = Response(response, content_type='application/json')
         return response
 
 

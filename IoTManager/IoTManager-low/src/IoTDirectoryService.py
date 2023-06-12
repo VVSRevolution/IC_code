@@ -1,11 +1,20 @@
-import peewee,zmq,socket,threading
+import peewee,zmq,socket,threading,time,psutil
 from datetime import datetime
+from playhouse.shortcuts import model_to_dict, dict_to_model
 
+ErroDS = False
 FORMAT = 'utf-8'
 PORT = 8080
-HOST = socket.gethostbyname(socket.gethostname())
-HOST = "127.0.1.1" #just for test <------------------- REMOVE THIS LINE
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(('8.8.8.8', 80))
+my_eip = s.getsockname()[0]
+nics = psutil.net_if_addrs()
+my_enic = [i for i in nics for j in nics[i]
+           if j.address == my_eip and j.family == socket.AF_INET][0]
+print('\033[1m[DIRECTORY SERVICE]:\033[0m\tEthernet NIC name is {0}\n\t\t\tIPv4 address is {1}.\n'.format(
+    my_enic, my_eip))
+HOST = format(my_eip)
 db = peewee.SqliteDatabase('IoTManager/IoTManager-low/database_ds.db')
 
 class BaseModel(peewee.Model):
@@ -49,9 +58,9 @@ try:
         ManagerFather,
         treeAddress  
     ])
-    print("[DATABASE]:\t[OK] ao criar tabela")
+    print("\033[1m[DATABASE]:\t\t[OK]\033[0m ao criar tabela\n")
 except:
-    print("[DATABASE]:\t[ERRO] ao criar tabela")
+    print("\033[1m[DATABASE]:\t[ERRO]\033[0m ao criar tabela\n")
 
 
 def sendIp(): # envia os ADDR dos virtualizers e geteways
@@ -59,9 +68,23 @@ def sendIp(): # envia os ADDR dos virtualizers e geteways
     s = context.socket(zmq.PUB)
     PortSend = str(PORT + 1)
     p = f"tcp://{(HOST)}:{PortSend}"
-    print(f"[DIRECTORY SERVICE]:\t Mandando dados em {p}")
-    s.bind(p)
+
+    try:
+        s.bind(p)
+    except Exception as error:
+        global ErroDS
+        ErroDS = True
+        saida = f"\n\33[1m[DIRECTORY SERVICE]:\033[0m \tNa função \033[3msendIP\033[0m:\n\t\t\tOcorreu erro ao tentar fazer um bind \033[3mem {p}\033[0m:"
+        print(saida,error)
+        return
+
+    print(f"[DIRECTORY SERVICE]:\tMandando dados \033[3mem {p}\033[0m")
     while(True):
+        manager = []
+        query = Manager.select().paginate(1, Manager.select().count())
+        for i in query:
+            manager.append(model_to_dict(i))
+
         query = Virtualizer.select(Virtualizer.ipVirtualizer, Virtualizer.portVirtualizer)
         virtualizerData = ""
         for virtualizer in query:
@@ -80,9 +103,16 @@ def getIp(): # recebe os ADDR dos virtualizers e geteways
     context = zmq.Context()
     socket = context.socket(zmq.REP)   
     p = "tcp://"+ HOST +":"+ str(PORT)
-    print(f"[DIRECTORY SERVICE]:\t Recebendo dados em {p}")
-    socket.bind(p)
-
+    
+    try:    
+        socket.bind(p)
+    except Exception as error:
+        global ErroDS
+        ErroDS = True
+        saida = f"\033[1m[DIRECTORY SERVICE]:\033[0m \tNa função \033[3mgetIP\033[0m:\n\t\t\tOcorreu erro ao tentar fazer um bind \033[3mem {p}\033[0m:"
+        print(saida,error)
+        return
+        print(f"[DIRECTORY SERVICE]:\t Recebendo dados \033[3mem {p}\033[0m")
     while True:
         message = socket.recv().decode(FORMAT)
         print("Received request: %s" % message)
@@ -106,7 +136,7 @@ def getIp(): # recebe os ADDR dos virtualizers e geteways
 
             if(data[0].upper() == "G"):
                 try:
-                    virtualizer = Gateway.create(
+                    gateway = Gateway.create(
                         ipGateway = ip,
                         portGateway = port,
                         registerTime = datetime.now()
@@ -114,14 +144,38 @@ def getIp(): # recebe os ADDR dos virtualizers e geteways
                     status = f"[DIRECTORY SERVICE]:\tGateway {ip}:{port} foi cadastrado."
                 except:
                     status = f"[DIRECTORY SERVICE]:\tGateway {ip}:{port} já esta cadastrado."
+
+            if(data[0].upper() == "M"):
+                try:
+                    query = Manager.get(
+                                Manager.ipManager == ip and
+                                Manager.portManager == port
+                            )
+                except ManagerFather.DoesNotExist:
+                    query = Manager.create(
+                        ipManager = ip,
+                        portManager = port,
+                        registerTime = datetime.now()
+
+                    )
             socket.send_string(status)
         except:
-            status ="[DIRECTORY SERVICE]:\t ERROR estrada não formatada corretamente"
+            status ="\033[1m[DIRECTORY SERVICE]:\033[0m\t ERROR estrada não formatada corretamente"
             socket.send_string(status)
     
-
 sendIP = threading.Thread(target = sendIp)
 getIP = threading.Thread(target = getIp)
+
 getIP.start()
+time.sleep(0.1)
 sendIP.start()
-print("[DIRECTORY SERVICE]:\tINICIADO")
+
+if(ErroDS):
+    time.sleep(1)
+    print("\n\033[1m[DIRECTORY SERVICE]:\033[0m \tO \033[3mDIRECTORY SERVICE\033[0m já esta rodando em outro local na rede ou outro serviço esta impedindo sua inicialização!\n")
+    ipDS = input("\033[1m[DIRECTORY SERVICE]:\033[0m\tSe o \033[3mDIRECTORY SERVICE\033[0m já estiver rodando na rede entre com o IP:")
+    while(ipDS == "" or not(ipDS.isdigit())):
+        ipDS = input("\033[1m[DIRECTORY SERVICE]:\033[0m\t ERRO IP não valido, entre com IP valido: ")
+else:
+    print("\n\033[1m[DIRECTORY SERVICE]:\033[0m\tINICIADO")            
+

@@ -13,7 +13,7 @@ my_eip = s.getsockname()[0]
 nics = psutil.net_if_addrs()
 my_enic = [i for i in nics for j in nics[i]
            if j.address == my_eip and j.family == socket.AF_INET][0]
-print('[MANAGER-HIGH]:\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
+print('\033[1m[MANAGER-HIGH]:\033[0m\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
     my_enic, my_eip))
 LOCAL_HOST = format(my_eip)
 
@@ -31,13 +31,13 @@ def IoTmanager():
     # Consultar Dados
         virtualizerHost = request.form.get("virtualizerHost")
         gatewayHost = request.form.get("gatewayHost")
-        print(f"[MANAGER]:\tMethod = POST, virtualizerHost = {virtualizerHost}")
-        print(f"[MANAGER]:\tMethod = POST, gatewayHost = {gatewayHost}")
+        print(f"\033[1m[MANAGER-HIGH]:\033[0m\tMethod = POST, virtualizerHost = {virtualizerHost}")
+        print(f"\033[1m[MANAGER-HIGH]:\033[0m\tMethod = POST, gatewayHost = {gatewayHost}")
         if(gatewayHost  != None):
-            print(f"[MANAGER]:\tRedirect to /gateway/{gatewayHost}")
+            print(f"\033[1m[MANAGER-HIGH]:\033[0m\tRedirect to /gateway/{gatewayHost}")
             return redirect(url_for('gateway_uuid',host=gatewayHost))
         if(virtualizerHost  != None):
-            print(f"[MANAGER]:\tRedirect to /virtualizer/{virtualizerHost}")
+            print(f"\033[1m[MANAGER-HIGH]:\033[0m\tRedirect to /virtualizer/{virtualizerHost}")
             return redirect(url_for('virtualizer_uuid',host=virtualizerHost))
 
     # Registrar no virtualizer 
@@ -50,7 +50,7 @@ def IoTmanager():
         headers= {'Content-type': 'application/json',}
 
         if(True):
-            print(f"[MANAGER]:\tCadastrando {capabiliteNome}")
+            print(f"\033[1m[MANAGER-HIGH]:\033[0m\tCadastrando {capabiliteNome}")
             msg = {
                 "name":capabiliteNome,
                 "description":capabiliteDescription,
@@ -60,8 +60,8 @@ def IoTmanager():
             try:
                 requests.post (f'http://{capabiliteAddr}/capabilities', data = json.dumps(msg),headers=headers)
             except:
-                print(f"[MANAGER]:\tNão foi possivel cadastrar {capabiliteNome}")
-                erroMsg1 = f"[MANAGER]:\tNão foi possivel cadastrar {capabiliteNome}"
+                print(f"\033[1m[MANAGER-HIGH]:\033[0m\tNão foi possivel cadastrar {capabiliteNome}")
+                erroMsg1 = f"\033[1m[MANAGER-HIGH]:\033[0m\tNão foi possivel cadastrar {capabiliteNome}"
                       #redirect(url_for('gateway_uuid',host=gatewayHost))
                 return redirect(url_for('erro_m',erroMsg=erroMsg1))
 
@@ -82,10 +82,10 @@ def virtualizer():
     if request.method == 'GET':
         headers = ("id","ipVirtualizer","portVirtualizer","registerTime")
         try:
-            print("[MANAGER]:\tConsultando Resources em /virtualizer")
+            print("\033[1m[MANAGER-HIGH]:\033[0m\tConsultando Resources em /virtualizer")
             resources = Virtualizer.select()
         except:
-            print("[MANAGER]:\tERRO no processo de consulta do Resource em /virtualizer")
+            print("\033[1m[MANAGER-HIGH]:\033[0m\tERRO no processo de consulta do Resource em /virtualizer")
         else:
             return render_template("table.html", headings=headers, data=resources)
 
@@ -94,10 +94,10 @@ def gateway():
     if request.method == 'GET':
         headers = ("id","ipGateway","portGateway","registerTime")
         try:
-            print("[MANAGER]:\tConsultando Resources em /gateway")
+            print("\033[1m[MANAGER-HIGH]:\033[0m\tConsultando Resources em /gateway")
             resources = Gateway.select()
         except:   
-            print("[MANAGER]:\tERRO no processo de consulta do Resource em /gateway")
+            print("\033[1m[MANAGER-HIGH]:\033[0m\tERRO no processo de consulta do Resource em /gateway")
         else:
             return render_template("table.html", headings=headers, data=resources)
     if request.method == 'POST':
@@ -113,10 +113,10 @@ def manager():
     if request.method == 'GET':
         headers = ("id","ipManager","portManager","registerTime")
         try:
-            print("[MANAGER]:\tConsultando Resources em /manager")
+            print("\033[1m[MANAGER-HIGH]:\033[0m\tConsultando Resources em /manager")
             resources = Manager.select()
         except:
-            print("[MANAGER]:\tERRO no processo de consulta do Resource em /manager")
+            print("\033[1m[MANAGER-HIGH]:\033[0m\tERRO no processo de consulta do Resource em /manager")
         else:
             return render_template("table.html", headings=headers, data=resources)
     if request.method == 'POST':
@@ -271,7 +271,7 @@ def setupfather():
                             portManager = query.portManager,
                             description = query.description,
                             registerTime = query.registerTime,
-                            lastUpdateTime = query.lasuttUpdateTime,
+                            lastUpdateTime = query.lastUpdateTime,
                             unregisterTime = datetime.now()
                         )
                         query.ipManager = ipFather
@@ -319,8 +319,8 @@ def search():
             "Gateways": [gateways]
         }
 
-        print(json.dumps(response, indent=4, sort_keys=True, default=str))
-        return json.dumps(response, indent=4, sort_keys=True, default=str)
+        print(jsonify(response, indent=4, sort_keys=True, default=str))
+        return jsonify(response, indent=4, sort_keys=True, default=str)
 
     if request.method == 'POST':
         localName = treeAddress.get()
@@ -350,23 +350,34 @@ def search():
                 "Virtualizers": virtualizers,
                 "Gateways": gateways
             }
-            print(json.dumps(response, indent=4, sort_keys=True, default=str))
-            return json.dumps(response, indent=4, sort_keys=True, default=str)
+            if 'datetime' in response:
+                response['datetime'] = response['datetime'].strftime('%Y-%m-%d %H:%M:%S')
+            json_data = json.dumps(response, cls=DateTimeEncoder, indent=4, sort_keys=True)
+            print(json_data)
+            #esta dando problema 
+            response = Response(json_data, content_type='application/json')
+            return response
+        
         else:
             print(f"{fullLoc} != {add}")
             pai = ManagerFather.get(ManagerFather.id == 1)
             print(f'POST http://{pai.ipManager}:{pai.portManager}/search -d {entrada}')
             response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/search', data = entrada)
+            response = Response(response, content_type='application/json')
             return response
         
-
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        return super().default(obj)
 
 
 if __name__ == "__main__":
     portF = 9000
     hostF = "0.0.0.0"
     print(f"\t\t\t\tThe port used is {portF}")
-    temp = input("\n[MANAGER-HIGH]:\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
+    temp = input("\n\033[1m[MANAGER-HIGH]:\033[0m\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
 
     if(temp != "" and temp.isdigit()):
         portF = int(temp)
@@ -379,7 +390,7 @@ if __name__ == "__main__":
                         portManager = portF,
                         registerTime = datetime.now()
     )
-    treeLoc = input("[MANAGER-HIGH]:\t\t\tNome para localização na árvore: ")
+    treeLoc = input("\033[1m[MANAGER-HIGH]:\033[0m\t\t\tNome para localização na árvore: ")
 
     try:
         query  = treeAddress.get(treeAddress.id == 1)
