@@ -1,7 +1,7 @@
 from flask import *
 import socket, requests, json
 from datetime import datetime
-from IoTDirectoryService import Virtualizer, Gateway, Manager, ManagerFather,treeAddress
+from IoTDirectoryService import *
 from playhouse.shortcuts import model_to_dict, dict_to_model
 import sys, os
 
@@ -407,4 +407,6 @@ if __name__ == "__main__":
     except treeAddress.DoesNotExist:
         query = treeAddress.create(name = treeLoc)
 
+    sendIpToDs(portF)
+    print("return")
     IoTmaganer.run(host = hostF, port = portF, debug=True, use_reloader=False)
