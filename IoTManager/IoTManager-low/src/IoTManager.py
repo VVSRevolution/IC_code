@@ -13,7 +13,7 @@ my_eip = s.getsockname()[0]
 nics = psutil.net_if_addrs()
 my_enic = [i for i in nics for j in nics[i]
            if j.address == my_eip and j.family == socket.AF_INET][0]
-print('\033[1m[MANAGER-HIGH]:\033[0m\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
+print('\033[1m[MANAGER-LOW]:\033[0m\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
     my_enic, my_eip))
 LOCAL_HOST = format(my_eip)
 
@@ -31,13 +31,13 @@ def IoTmanager():
     # Consultar Dados
         virtualizerHost = request.form.get("virtualizerHost")
         gatewayHost = request.form.get("gatewayHost")
-        print(f"\033[1m[MANAGER-HIGH]:\033[0m\tMethod = POST, virtualizerHost = {virtualizerHost}")
-        print(f"\033[1m[MANAGER-HIGH]:\033[0m\tMethod = POST, gatewayHost = {gatewayHost}")
+        print(f"\033[1m[MANAGER-LOW]:\033[0m\tMethod = POST, virtualizerHost = {virtualizerHost}")
+        print(f"\033[1m[MANAGER-LOW]:\033[0m\tMethod = POST, gatewayHost = {gatewayHost}")
         if(gatewayHost  != None):
-            print(f"\033[1m[MANAGER-HIGH]:\033[0m\tRedirect to /gateway/{gatewayHost}")
+            print(f"\033[1m[MANAGER-LOW]:\033[0m\tRedirect to /gateway/{gatewayHost}")
             return redirect(url_for('gateway_uuid',host=gatewayHost))
         if(virtualizerHost  != None):
-            print(f"\033[1m[MANAGER-HIGH]:\033[0m\tRedirect to /virtualizer/{virtualizerHost}")
+            print(f"\033[1m[MANAGER-LOW]:\033[0m\tRedirect to /virtualizer/{virtualizerHost}")
             return redirect(url_for('virtualizer_uuid',host=virtualizerHost))
 
     # Registrar no virtualizer 
@@ -50,7 +50,7 @@ def IoTmanager():
         headers= {'Content-type': 'application/json',}
 
         if(True):
-            print(f"\033[1m[MANAGER-HIGH]:\033[0m\tCadastrando {capabiliteNome}")
+            print(f"\033[1m[MANAGER-LOW]:\033[0m\tCadastrando {capabiliteNome}")
             msg = {
                 "name":capabiliteNome,
                 "description":capabiliteDescription,
@@ -60,8 +60,8 @@ def IoTmanager():
             try:
                 requests.post (f'http://{capabiliteAddr}/capabilities', data = json.dumps(msg),headers=headers)
             except:
-                print(f"\033[1m[MANAGER-HIGH]:\033[0m\tNão foi possivel cadastrar {capabiliteNome}")
-                erroMsg1 = f"\033[1m[MANAGER-HIGH]:\033[0m\tNão foi possivel cadastrar {capabiliteNome}"
+                print(f"\033[1m[MANAGER-LOW]:\033[0m\tNão foi possivel cadastrar {capabiliteNome}")
+                erroMsg1 = f"\033[1m[MANAGER-LOW]:\033[0m\tNão foi possivel cadastrar {capabiliteNome}"
                       #redirect(url_for('gateway_uuid',host=gatewayHost))
                 return redirect(url_for('erro_m',erroMsg=erroMsg1))
 
@@ -82,10 +82,10 @@ def virtualizer():
     if request.method == 'GET':
         headers = ("id","ipVirtualizer","portVirtualizer","registerTime")
         try:
-            print("\033[1m[MANAGER-HIGH]:\033[0m\tConsultando Resources em /virtualizer")
+            print("\033[1m[MANAGER-LOW]:\033[0m\tConsultando Resources em /virtualizer")
             resources = Virtualizer.select()
         except:
-            print("\033[1m[MANAGER-HIGH]:\033[0m\tERRO no processo de consulta do Resource em /virtualizer")
+            print("\033[1m[MANAGER-LOW]:\033[0m\tERRO no processo de consulta do Resource em /virtualizer")
         else:
             return render_template("table.html", headings=headers, data=resources)
 
@@ -94,10 +94,10 @@ def gateway():
     if request.method == 'GET':
         headers = ("id","ipGateway","portGateway","registerTime")
         try:
-            print("\033[1m[MANAGER-HIGH]:\033[0m\tConsultando Resources em /gateway")
+            print("\033[1m[MANAGER-LOW]:\033[0m\tConsultando Resources em /gateway")
             resources = Gateway.select()
         except:   
-            print("\033[1m[MANAGER-HIGH]:\033[0m\tERRO no processo de consulta do Resource em /gateway")
+            print("\033[1m[MANAGER-LOW]:\033[0m\tERRO no processo de consulta do Resource em /gateway")
         else:
             return render_template("table.html", headings=headers, data=resources)
     if request.method == 'POST':
@@ -113,10 +113,10 @@ def manager():
     if request.method == 'GET':
         headers = ("id","ipManager","portManager","registerTime")
         try:
-            print("\033[1m[MANAGER-HIGH]:\033[0m\tConsultando Resources em /manager")
+            print("\033[1m[MANAGER-LOW]:\033[0m\tConsultando Resources em /manager")
             resources = Manager.select()
         except:
-            print("\033[1m[MANAGER-HIGH]:\033[0m\tERRO no processo de consulta do Resource em /manager")
+            print("\033[1m[MANAGER-LOW]:\033[0m\tERRO no processo de consulta do Resource em /manager")
         else:
             return render_template("table.html", headings=headers, data=resources)
     if request.method == 'POST':
@@ -132,10 +132,10 @@ def father():
 
         headers = ("id","IpManager","PortManager","Description","Register Time","Last Update","Unregister Time")
         try:
-            print("[MANAGER_HIGH]:\tConsultando Resources em /father")
+            print("[MANAGER_LOW]:\tConsultando Resources em /father")
             resources = ManagerFather.select()
         except:
-            print("[MANAGER_HIGH]:\tERRO no processo de consulta do Resource em /father")
+            print("[MANAGER_LOW]:\tERRO no processo de consulta do Resource em /father")
         else:
             return render_template("table.html", headings=headers, data=resources)
     if request.method == 'POST':
@@ -248,7 +248,7 @@ def setupfather():
                 loc = treeAddress.get(treeAddress.id == 1)
                 loc.parent = p_loc
                 loc.save()
-                print("[MANAGER_HIGH]:\tUpdating Father")
+                print("[MANAGER_LOW]:\tUpdating Father")
                 
                 try:
                     query = ManagerFather.get(
@@ -286,12 +286,12 @@ def setupfather():
             except Exception as error:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
 
-                print("[MANAGER_HIGH]:\tERRO ao atualizar Father", error)
+                print("[MANAGER_LOW]:\tERRO ao atualizar Father", error)
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 print(exc_type, fname, exc_tb.tb_lineno)    
         except:
-            print(f"[MANAGER_HIGH]:\tERRO ao receber cadastro do Pai")
+            print(f"[MANAGER_LOW]:\tERRO ao receber cadastro do Pai")
 
     return "@erro404"
 
@@ -377,7 +377,7 @@ if __name__ == "__main__":
     portF = 9000
     hostF = "0.0.0.0"
     print(f"\t\t\t\tThe port used is {portF}")
-    temp = input("\n\033[1m[MANAGER-HIGH]:\033[0m\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
+    temp = input("\n\033[1m[MANAGER-LOW]:\033[0m\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
 
     if(temp != "" and temp.isdigit()):
         portF = int(temp)
@@ -390,7 +390,7 @@ if __name__ == "__main__":
                         portManager = portF,
                         registerTime = datetime.now()
     )
-    treeLoc = input("\033[1m[MANAGER-HIGH]:\033[0m\t\t\tNome para localização na árvore: ")
+    treeLoc = input("\033[1m[MANAGER-LOW]:\033[0m\t\t\tNome para localização na árvore: ")
 
     try:
         query  = treeAddress.get(treeAddress.id == 1)
@@ -407,6 +407,6 @@ if __name__ == "__main__":
     except treeAddress.DoesNotExist:
         query = treeAddress.create(name = treeLoc)
 
-    sendIpToDs(portF)
-    print("return")
+    x = sendIpToDs(portF)
+    print(f"[MANAGER_LOW]:\t\t\tIniciando Flask . . .\n\n\033[1m---------------------------------------FLASK---------------------------------------\033[0m")
     IoTmaganer.run(host = hostF, port = portF, debug=True, use_reloader=False)

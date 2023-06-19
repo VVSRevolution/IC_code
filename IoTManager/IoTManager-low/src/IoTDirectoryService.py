@@ -1,4 +1,4 @@
-import peewee,zmq,socket,threading,time,psutil,sys
+import peewee,zmq,socket,threading,time,psutil,sys,traceback
 from datetime import datetime
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
@@ -65,23 +65,27 @@ except:
 
 def sendIpToDs(portUsed):
     global ipDS
-    if(ErroDS):
+
+
+
+    if ErroDS:
         try:
             context = zmq.Context()
             socket = context.socket(zmq.REQ)
-            conc = f"tcp://{ipDS}:{PORT}"
+            conc = f"tcp://{ipDS}:8080"
             socket.setsockopt(zmq.RCVTIMEO, 1000)
-            print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tMandando para \033[3mDIRECTORY SERVICE\033[0m: {conc}\n\t\t\t . . .")
+            print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tMandando para \033[3mDIRECTORY SERVICE\033[0m: \033[3m{conc}\033[0m\n\t\t\t . . .")
             socket.connect(conc)
             socket.send_string(f"M${HOST}${portUsed}")
-            msg = socket.recv().decode(FORMAT)
-            return
-        except:
-            print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tERROR ao mandar ADDR ao \033[3mDIRECTORY SERVICE\033[0m\n\t\t\tNão foi possivel conectar ao {conc}")
+            if socket.poll(1000) != 0:
+                msg = socket.recv().decode(FORMAT)
+            else:
+                print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tERROR ao mandar ADDR ao \033[3mDIRECTORY SERVICE\033[0m\n\t\t\tNão foi possível conectar ao \033[3m{conc}\033[0m.")
+            print(msg)
             socket.close()
-            return
-
-        return
+        except:
+            print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tERROR ao mandar ADDR ao \033[3mDIRECTORY SERVICE\033[0m\n\t\t\tNão foi possível conectar ao \033[3m{conc}\033[0m\n")
+            traceback.print_exc()
 
 def sendIp(): # um pub/sub que envia os ADDR dos virtualizers, geteways e managers
     context = zmq.Context()
@@ -129,13 +133,13 @@ def getIp(): # recebe os ADDR dos virtualizers e geteways
     except Exception as error:
         global ErroDS
         ErroDS = True
-        saida = f"\033[1m[DIRECTORY SERVICE]:\033[0m \tNa função \033[3mgetIP\033[0m:\n\t\t\tOcorreu erro ao tentar fazer um bind \033[3mem {p}\033[0m:"
+        saida = f"\033[1m[DIRECTORY SERVICE]:\033[0m \tNa função \033[3mgetIP\033[0m:\n\t\t\tOcorreu erro ao tentar fazer um bind em\033[3m {p}\033[0m:"
         print(saida,error)
         return
-    print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tRecebendo dados \033[3mem {p}\033[0m")
+    print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tRecebendo dados em\033[3m {p}\033[0m")
     while True:
         message = socket.recv().decode(FORMAT)
-        print("Received request: %s" % message)
+        print(f"\033[1m[DIRECTORY SERVICE]:\033[0m\tRecebendo:[ \033[1m{message}\033[0m ]")
         try:
 
             data = message.split("$")
@@ -167,20 +171,23 @@ def getIp(): # recebe os ADDR dos virtualizers e geteways
 
             if(data[0].upper() == "M"):
                 try:
-                    query = Manager.get(
-                                Manager.ipManager == ip and
-                                Manager.portManager == port
-                            )
-                except ManagerFather.DoesNotExist:
-                    query = Manager.create(
-                        ipManager = ip,
-                        portManager = port,
-                        registerTime = datetime.now()
-
-                    )
+                    try:
+                        query = Manager.get(
+                                    Manager.ipManager == ip and
+                                    Manager.portManager == port
+                                )
+                    except ManagerFather.DoesNotExist:
+                        query = Manager.create(
+                            ipManager = ip,
+                            portManager = port,
+                            registerTime = datetime.now()
+                        )
+                    status = f"\033[1m[DIRECTORY SERVICE]:\033[0m\tManager {ip}:{port} foi cadastrado."
+                except:
+                    status = f"\033[1m[DIRECTORY SERVICE]:\033[0m\tManager {ip}:{port} já esta cadastrado."
             socket.send_string(status)
-        except:
-            status ="\033[1m[DIRECTORY SERVICE]:\033[0m\t ERROR estrada não formatada corretamente"
+        except Exception as error:
+            status =f"\033[1m[DIRECTORY SERVICE]:\033[0m\t ERROR estrada não formatada corretamente\n\t\tERROR: {error}"
             socket.send_string(status)
 
 
