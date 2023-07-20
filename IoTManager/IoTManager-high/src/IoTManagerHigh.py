@@ -139,34 +139,36 @@ def setupfather():
                 
                 try:
                     query = ManagerHighFather.get(
-                            (ManagerHighFather.ipManager == ipFather) and
-                            (ManagerHighFather.portManager == portFather)
+                            (ManagerHighFather.id == 1)
                         )
                 except ManagerHighFather.DoesNotExist:
                     query = ManagerHighFather.create(
                         ipManager = ipFather,
-                        portManager = portFather
+                        portManager = portFather,
+                        description = descFather
                     )
                 
-                if(query.ipManager == ipFather and query.portManager == str(portFather)):
-                    query.description = descFather
-                    query.lastUpdateTime = datetime.now()
-                    query.description = descFather
                 else:
-                    managerdb = ManagerHighFather.create(
-                        ipManager = query.ipManager,
-                        portManager = query.portManager,
-                        description = query.description,
-                        registerTime = query.registerTime,
-                        lastUpdateTime = query.lasuttUpdateTime,
-                        unregisterTime = datetime.now()
-                    )
-                    query.ipManager = ipFather
-                    query.portManager = portFather
-                    query.description = descFather
-                    query.lastUpdateTime = None
-                    query.registerTime = datetime.now()
-                query.save()
+                    if(query.ipManager == ipFather and query.portManager == str(portFather)):
+                        query.description = descFather
+                        query.lastUpdateTime = datetime.now()
+                        query.description = descFather
+                    else:
+                        managerdb = ManagerHighFather.create(
+                            ipManager = query.ipManager,
+                            portManager = query.portManager,
+                            description = query.description,
+                            registerTime = query.registerTime,
+                            lastUpdateTime = query.lastUpdateTime,
+                            unregisterTime = datetime.now()
+                        )
+                        query.ipManager = ipFather
+                        query.portManager = portFather
+                        query.description = descFather
+                        query.lastUpdateTime = None
+                        query.registerTime = datetime.now()
+                        query.save()
+
                 localName = treeEndress.get()
                 print(f"mandando repouse = {localName.name}")
                 return localName.name
