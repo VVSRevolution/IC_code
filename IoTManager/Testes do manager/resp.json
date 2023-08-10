@@ -1,0 +1,18 @@
+{
+    "Gateways": [
+        {
+            "id": 1,
+            "ipGateway": "127.0.1.1",
+            "portGateway": "8000",
+            "registerTime": "2023-06-01 14:35:36"
+        },
+        {
+            "id": 2,
+            "ipGateway": "127.0.1.1",
+            "portGateway": "8000",
+            "registerTime": "2023-06-01 15:29:27"
+        }
+    ],
+    "Manager address": "/A/C",
+    "Virtualizers": []
+}
