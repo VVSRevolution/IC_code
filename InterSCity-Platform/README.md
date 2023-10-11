@@ -22,24 +22,30 @@ https://minikube.sigs.k8s.io/docs/start/
 
 
 4 -    
+
     kubectl apply -f 1\ -Postgres/
 
 
 5 - 
+
     kubectl get pods -n interscity
 
 6 - 
+
     kubectl apply -f 2\ -\ Third\ Party\ Service/
 
 - Delete o migrate após o kong subir
 
 7 - 
+
     kubectl delete -f 2\ -\ Third\ Party\ Service/kong-migration-pod.yaml  
 
 8 - 
+
     kubectl apply -f 3\ -\ Interscity/
 
 9 - 
+
     kubectl get pods -n interscity
 
 - OBS: em erro de baixar imagens baixe diretamente via docker pull
