@@ -69,10 +69,10 @@ kubectl get svc -n interscity
 
 Demais comandos (não precisa executar):
 
-eval $(minikube docker-env)
+    eval $(minikube docker-env)
 
-kubectl delete -f 3\ -\ Interscity/data-collector-deploy.yaml
+    kubectl delete -f 3\ -\ Interscity/data-collector-deploy.yaml
 
-kubectl delete -R -f .
+    kubectl delete -R -f .
 
-kubectl get pods -n interscity --watch
+    kubectl get pods -n interscity --watch
