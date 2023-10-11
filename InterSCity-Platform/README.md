@@ -78,7 +78,7 @@ https://minikube.sigs.k8s.io/docs/start/
 
 
 - Demais comandos (não precisa executar):
-
+    
     eval $(minikube docker-env)
 
     kubectl delete -f 3\ -\ Interscity/data-collector-deploy.yaml
