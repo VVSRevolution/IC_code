@@ -71,7 +71,7 @@ https://minikube.sigs.k8s.io/docs/start/
 
 - Irá gerar duas url para o Kong
 
-- Para testar
+12 - Para testar
 :
 
     curl http://{url}/upstreams 
@@ -79,7 +79,7 @@ https://minikube.sigs.k8s.io/docs/start/
     curl http://{url}/collector/resources/data
 
 
-- Demais comandos (não precisa executar)
+13 - Demais comandos (não precisa executar)
 :
 
     eval $(minikube docker-env)
