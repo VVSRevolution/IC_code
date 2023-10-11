@@ -49,6 +49,7 @@ https://minikube.sigs.k8s.io/docs/start/
     kubectl get pods -n interscity
 
 - OBS: em erro de baixar imagens baixe diretamente via docker pull
+.
 
     docker login registry.lsdi.ufma.br
 
@@ -70,15 +71,17 @@ https://minikube.sigs.k8s.io/docs/start/
 
 - Irá gerar duas url para o Kong
 
-- Para testar:
+- Para testar
+:
 
     curl http://{url}/upstreams 
 
     curl http://{url}/collector/resources/data
 
 
-- Demais comandos (não precisa executar):
-    
+- Demais comandos (não precisa executar)
+:
+
     eval $(minikube docker-env)
 
     kubectl delete -f 3\ -\ Interscity/data-collector-deploy.yaml
