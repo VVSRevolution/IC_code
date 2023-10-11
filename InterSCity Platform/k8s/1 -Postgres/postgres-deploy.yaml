@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: interscity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      volumes:
+      - name: postgres-volume
+        persistentVolumeClaim:
+          claimName: postgresql-pvc
+      - name: psql-script
+        configMap:
+          name: psql-script
+          items:
+          - path: psql-script.sh
+            key: psql-script.sh     
+      containers:
+      - name: postgres
+        image: postgres:11
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: admin
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-volume
+        - mountPath: /docker-entrypoint-initdb.d/psql-script.sh
+          name: psql-script
+          readOnly: false
+          subPath: psql-script.sh

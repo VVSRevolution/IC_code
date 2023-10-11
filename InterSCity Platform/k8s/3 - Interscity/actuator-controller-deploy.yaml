@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: actuator-controller
+  namespace: interscity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: actuator-controller
+  template:
+    metadata:
+      labels:
+        app: actuator-controller
+    spec:
+      containers:
+      - name: actuator-controller
+        image: registry.gitlab.com/interscity/interscity-platform/interscity-platform/actuator-controller
+        imagePullPolicy: IfNotPresent
+        command: 
+        - /bin/sh
+        - -c
+        - bundle exec rake db:create && bundle exec rake db:migrate && bundle exec puma -C config/puma.rb -e development
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: interscity-config
+        env:
+        - name: SELF_HOST
+          value: actuator-controller-service:3000
+        - name: REDIS_HOST
+          value: redis
+        - name: RAILS_RELATIVE_URL_ROOT
+          value: actuator

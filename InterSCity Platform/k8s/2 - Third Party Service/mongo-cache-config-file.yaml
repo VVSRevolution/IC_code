@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-cache-config-file
+  namespace: interscity
+data:
+  mongod.conf: |-
+    # mongod.conf, Percona Server for MongoDB
+    # for documentation of all options, see:
+    #   http://docs.mongodb.org/manual/reference/configuration-options/
+
+    # Where and how to store data.
+    storage:
+      dbPath: /var/lib/mongo
+      journal:
+        enabled: true
+    #  engine: wiredTiger
+      engine: inMemory
+
+    #  More info for inMemory: https://www.percona.com/doc/percona-server-for-mongodb/4.4/inmemory.html#configuring-percona-memory-engine
+      inMemory:
+        engineConfig:
+          inMemorySizeGB: 1
+          statisticsLogDelaySecs: 0
+
+    # where to write logging data.
+    systemLog:
+      destination: file
+      logAppend: true
+      path: /var/log/mongo/mongod.log
+
+    processManagement:
+      fork: true
+      pidFilePath: /var/run/mongod.pid
+
+    # network interfaces
+    net:
+      port: 27017
+      bindIp: 127.0.0.1

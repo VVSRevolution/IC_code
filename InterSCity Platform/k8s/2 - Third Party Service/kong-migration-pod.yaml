@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kong-migration-pod
+  namespace: interscity
+spec:
+  containers:
+  - name: kong
+    image: kong:0.11.0
+    command:
+      - kong 
+      - migrations
+      - up
+      - -v
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: KONG_PG_USER
+      value: postgres
+    - name: KONG_PG_PASSWORD
+      value: admin
+    - name: KONG_DATABASE
+      value: postgres
+    - name: KONG_PG_HOST
+      value: postgres-service

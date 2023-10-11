@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-discoverer
+  namespace: interscity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-discoverer
+  template:
+    metadata:
+      labels:
+        app: resource-discoverer
+    spec:
+      containers:
+      - name: resource-discoverer
+        image: registry.lsdi.ufma.br/interscity/resource-discovery:0.0.2
+        imagePullPolicy: IfNotPresent
+        command: 
+        - /bin/sh
+        - -c
+        - bundle exec rake db:create && bundle exec rake db:migrate && bundle exec puma -C config/puma.rb -e development
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: interscity-config
+        env:
+        - name: SELF_HOST
+          value: resource-discoverer-service:3000
+        - name: RAILS_RELATIVE_URL_ROOT
+          value: discovery
+        - name: CATALOGUER_HOST
+          value: http://resource-cataloguer-service:3000
+        - name: DATACOLLECTOR_HOST
+          value: http://data-collector-service:3000

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-adaptor
+  namespace: interscity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-adaptor
+  template:
+    metadata:
+      labels:
+        app: resource-adaptor
+    spec:
+      containers:
+      - name: resource-adaptor
+        image: registry.gitlab.com/interscity/interscity-platform/interscity-platform/resource-adaptor
+        imagePullPolicy: IfNotPresent
+        command: 
+        - /bin/sh
+        - -c
+        - bundle exec rake db:create && bundle exec rake db:migrate && bundle exec puma -C config/puma.rb -e development
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: interscity-config
+        env:
+        - name: SELF_HOST
+          value: resource-adaptor-service:3000
+        - name: REDIS_HOST
+          value: redis
+        - name: RAILS_RELATIVE_URL_ROOT
+          value: catalog

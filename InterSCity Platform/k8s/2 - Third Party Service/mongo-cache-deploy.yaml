@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-cache-deploy
+  namespace: interscity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-cache
+  template:
+    metadata:
+      labels:
+        app: mongo-cache
+    spec:
+      containers:
+      - name: mongo
+        image: percona/percona-server-mongodb:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 27017
+        env:
+        - name: AUTH
+          value: 'no'
+        volumeMounts:
+        - mountPath: /etc/mongod.conf
+          name: mongo-cache-config-file
+          readOnly: false
+          subPath: mongod.conf
+      volumes:
+      - name: mongo-cache-config-file
+        configMap:
+          name: mongo-cache-config-file
+          items:
+          - path: mongod.conf
+            key: mongod.conf

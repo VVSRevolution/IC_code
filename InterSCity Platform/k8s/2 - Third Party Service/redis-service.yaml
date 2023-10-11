@@ -1,0 +1,14 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: redis
+  name: redis-service
+  namespace: interscity
+spec:
+  ports:
+  - name: db
+    port: 6379
+  selector:
+    app: redis

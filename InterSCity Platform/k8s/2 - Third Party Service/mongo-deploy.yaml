@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deploy
+  namespace: interscity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      volumes:
+      - name: mongo-volume
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+      containers:
+      - name: mongo
+        image: mongo:3.4
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 27017
+        env:
+        - name: AUTH
+          value: 'no'
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongo-volume

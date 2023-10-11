@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: interscity-config
+  namespace: interscity
+data:
+  RAILS_ENV: development
+  RAILS_MAX_THREADS: '200'
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: '5432'
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: admin
+  SECRET_KEY_BASE: admin
+  RABBITMQ_HOST: "rabbitmq-service"
+  REGISTER_METHOD: "target"
+  KONG_URI: "http://kong-service:8001"
+#  SELF_HOST: diferente para cada serviço, aconselhar adicionar prefixo do modulo
+ # REDIS_HOST: "redis://redis" Não há padrão no valor
+  REDIS_PORT: '6379'
+
+  MONGO_USER: "admin"
+  MONGO_PASSWORD: admin
+  MONGO_HOST: mongo-service
+  MONGO_PORT: '27017'
+  MONGO_CACHE_HOST: mongo-cache-service
+  MONGO_CACHE_PORT: '27017'
+
+
+  CATALOGUER_HOST: resource-cataloguer-service
+  ADAPTOR_HOST: resource-adaptor-service
+  TAGGER_URL: http://tagger-service:8080/tagger/taggedObject/tagExpression
+
+# Apenas para lembrar RAILS_RELATIVE_URL_ROOT
+
+

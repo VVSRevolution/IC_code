@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-pvc
+  namespace: interscity
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: interscity-sc 
+  resources:
+    requests:
+      storage: 5Gi
