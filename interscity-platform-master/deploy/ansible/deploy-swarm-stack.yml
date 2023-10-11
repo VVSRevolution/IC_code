@@ -1,7 +1,0 @@
-- name: Deploy Swarm Stack
-  hosts:
-    - swarm-manager
-  roles:
-    - deploy-swarm-stack
-  become_user: root
-  become: yes

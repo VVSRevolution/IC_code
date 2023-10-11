@@ -1,9 +1,0 @@
-# Be sure to restart your server when you modify this file
-
-services:
-  catalog: "catalog.url"
-  colector: "colector.url"
-  resource: "resource.url"
-  rabbitmq: "rabbitmq"
-  kong: "kong:8001"
-
