@@ -48,7 +48,7 @@ https://minikube.sigs.k8s.io/docs/start/
 
     kubectl get pods -n interscity
 
-- OBS: em erro de baixar imagens baixe diretamente via docker pull
+9.1 - OBS: em erro de baixar imagens baixe diretamente via docker pull
 .
 
     docker login registry.lsdi.ufma.br
