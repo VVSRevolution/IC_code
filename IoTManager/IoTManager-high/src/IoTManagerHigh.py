@@ -313,7 +313,11 @@ def search():
         response = requests.post (f'http://{pai.ipManager}:{pai.portManager}/search', data = entrada)
         response = Response(response, content_type='application/json')
         return response
-
+@IoTmaganer.route('/AutoSetVirtualizer',methods =['POST'])
+def AutoSetVirtualizer():
+    if request.method == 'POST':    
+        Json = request.get_json()
+        Sensors = Json["sensors"]
 
 #main
 if __name__ == "__main__":
