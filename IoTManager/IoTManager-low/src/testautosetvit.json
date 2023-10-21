@@ -1,0 +1,32 @@
+{   
+    "sensors":{
+        "capabilities:":[
+            {
+                "name":"averagePressure",
+                "address":"A/B",
+                "addr":"172.24.219.147:9000",
+                "capability_type":"sensor",
+                "association": "$average:pressure" 
+            },{
+                "name":"averageTemperature",
+                "address":"A/B",
+                "addr":"172.24.219.147:9000",
+                "capability_type":"sensor",
+                "association": "$average:temperature" 
+            }
+        ],
+        "resources":{
+            "description": "Test9/7/22",
+            "capabilities": [
+                "averageTemperature",
+                "averagePressure"
+            ],
+            "status": "active",
+            "lat":10,
+            "lon":12
+        }
+    },
+    "rules":[
+        "latency"
+    ]
+}
