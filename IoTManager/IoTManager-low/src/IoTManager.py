@@ -2,6 +2,7 @@ from flask import *
 import socket, requests, json
 from datetime import datetime
 from IoTDirectoryService import *
+from IoTCreateVirtualizer import *
 from playhouse.shortcuts import model_to_dict, dict_to_model
 import sys, os
 
@@ -368,10 +369,33 @@ def search():
 
 @IoTmaganer.route('/AutoSetVirtualizer',methods =['POST'])
 def AutoSetVirtualizer():
-    if request.method == 'POST':    
+    if request.method == 'POST':  
+
         Json = request.get_json()
         Sensors = Json["sensors"]
+        Capabilities = Sensors["capabilities"]
 
+        listUrl = []
+        for Cap in Capabilities:
+            listUrl.append(Cap["addr"])
+        
+        BetterUrl = latencyTest(listUrl)
+
+        for Cap in Capabilities:
+            msg = {
+                "name":Cap["name"],
+                "description":Cap["description"],
+                "capability_type":Cap["capability_type"],
+                "association": Cap["association"], 
+            }
+            cadastrarCap(msg,BetterUrl)
+
+        msg = {
+            "regInfos":{Sensors["resources"]
+            },
+            "realSensors":[{"uuid":"709fd3e3-4112-46f4-b148-4778775998e7","capabilities":["temperature","pressure"]}]
+        }
+        cadastrarRec(msg,BetterUrl)
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):

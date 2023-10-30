@@ -1,14 +1,16 @@
 {   
     "sensors":{
-        "capabilities:":[
+        "capabilities":[
             {
                 "name":"averagePressure",
+                "description":"Teste",
                 "address":"A/B",
                 "addr":"172.24.219.147:9000",
                 "capability_type":"sensor",
                 "association": "$average:pressure" 
             },{
                 "name":"averageTemperature",
+                "description":"Teste",
                 "address":"A/B",
                 "addr":"172.24.219.147:9000",
                 "capability_type":"sensor",
