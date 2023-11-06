@@ -8,6 +8,7 @@ import sys, os
 
 import psutil
 
+portF = 9000
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(('8.8.8.8', 80))
 my_eip = s.getsockname()[0]
@@ -312,20 +313,25 @@ def search():
         query = Gateway.select().paginate(1, Gateway.select().count())
         for i in query:
             gateways.append(model_to_dict(i))
+
         localName = treeAddress.get()
         fullLoc = f"{localName.parent}/{localName.name}"
         response = {
             "Manager address": fullLoc,
-            "Virtualizers": [virtualizers],
-            "Gateways": [gateways]
+            "addr": f"{LOCAL_HOST}:{portF}",
+            "Virtualizers": virtualizers,
+            "Gateways": gateways
         }
-
-        print(jsonify(response, indent=4, sort_keys=True, default=str))
-        return jsonify(response, indent=4, sort_keys=True, default=str)
+        if 'datetime' in response:
+            response['datetime'] = response['datetime'].strftime('%Y-%m-%d %H:%M:%S')
+        json_data = json.dumps(response, cls=DateTimeEncoder, indent=4, sort_keys=True)
+        print(json_data)
+        response = Response(json_data, content_type='application/json')
+        return response
 
     if request.method == 'POST':
         localName = treeAddress.get()
-        #curl http://172.28.148.165:9002/search -d "/A/C"
+        #curl http://172.24.219.147:8000/search -d "/a"
         fullLoc = f"{localName.parent}/{localName.name}"
         #fullLoc = "a/b/d"
         fullLoc = fullLoc.split("/")
@@ -348,6 +354,7 @@ def search():
             fullLoc = f"{localName.parent}/{localName.name}"
             response = {
                 "Manager address": fullLoc,
+                "addr": f"{LOCAL_HOST}:{portF}",
                 "Virtualizers": virtualizers,
                 "Gateways": gateways
             }
@@ -355,7 +362,6 @@ def search():
                 response['datetime'] = response['datetime'].strftime('%Y-%m-%d %H:%M:%S')
             json_data = json.dumps(response, cls=DateTimeEncoder, indent=4, sort_keys=True)
             print(json_data)
-            #esta dando problema 
             response = Response(json_data, content_type='application/json')
             return response
         
@@ -405,7 +411,7 @@ class DateTimeEncoder(json.JSONEncoder):
 
 
 if __name__ == "__main__":
-    portF = 9000
+
     hostF = "0.0.0.0"
     print(f"\t\t\t\tThe port used is {portF}")
     temp = input("\n\033[1m[MANAGER-LOW]:\033[0m\t\t\tDo you like to change de port?\n\t\t\t\tPress ENTER to NO or enter with the PORT NUMBER to YES: ")
@@ -440,4 +446,4 @@ if __name__ == "__main__":
 
     x = sendIpToDs(portF)
     print(f"[MANAGER_LOW]:\t\t\tIniciando Flask . . .\n\n\033[1m---------------------------------------FLASK---------------------------------------\033[0m")
-    IoTmaganer.run(host = hostF, port = portF, debug=True, use_reloader=False)
+    IoTmaganer.run(host = LOCAL_HOST, port = portF, debug=True, use_reloader=False)
