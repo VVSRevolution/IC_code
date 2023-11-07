@@ -4,13 +4,22 @@ from flask.wrappers import Response
 from manager import Manager
 from cataloguer import Cataloguer
 import socket, threading, zmq, time, csv
-
+import psutil
 
 
 app = Flask(__name__)
 
-LOCAL_HOST = socket.gethostbyname(socket.gethostname())
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(('8.8.8.8', 80))
+my_eip = s.getsockname()[0]
+nics = psutil.net_if_addrs()
+my_enic = [i for i in nics for j in nics[i]
+           if j.address == my_eip and j.family == socket.AF_INET][0]
+print('\033[1m[GATEWAY]:\033[0m\t\t\tEthernet NIC name is {0}\n\t\t\t\tIPv4 address is {1}.'.format(
+    my_enic, my_eip))
+LOCAL_HOST = format(my_eip)
 FORMAT = 'utf-8'
+
 
 
 @app.route('/')

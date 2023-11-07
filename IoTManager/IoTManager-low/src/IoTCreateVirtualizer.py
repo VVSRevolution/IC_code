@@ -56,5 +56,3 @@ def cadastrarRec(msg,url):
         #erroMsg1 = f"\033[1m[MANAGER-LOW]:\033[0m\tNão foi possivel cadastrar {capabiliteNome}"
         #return redirect(url_for('erro_m',erroMsg=erroMsg1))
 
-urls = ["http://www.google.com", "http://www.example.com", "http://www.x.com"]
-latencyTest(urls)
