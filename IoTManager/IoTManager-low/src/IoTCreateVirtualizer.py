@@ -1,5 +1,4 @@
 import socket, requests, json
-from ping3 import ping, verbose_ping
 
 def latencyTest(list):
     menor_tempo = float('inf')
