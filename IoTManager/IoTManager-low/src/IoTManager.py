@@ -4,7 +4,7 @@ from datetime import datetime
 from IoTDirectoryService import *
 from IoTCreateVirtualizer import *
 from playhouse.shortcuts import model_to_dict, dict_to_model
-import sys, os
+import sys, os, math
 
 import psutil
 
@@ -376,16 +376,24 @@ def search():
 @IoTmaganer.route('/AutoSetVirtualizer',methods =['POST'])
 def AutoSetVirtualizer():
     if request.method == 'POST':  
+        #curl -X POST -H "Content-Type: application/json" -d @testautosetvit.json http://172.24.219.147:9000/AutoSetVirtualizer
+
 
         Json = request.get_json()
         Sensors = Json["sensors"]
         Capabilities = Sensors["capabilities"]
+        print(Json)
 
-        listUrl = []
-        for Cap in Capabilities:
-            listUrl.append(Cap["addr"])
+        if Json["rules"]["type"] == "latency-precision":
+            latencyPrecision(Json)
         
-        BetterUrl = latencyTest(listUrl)
+
+        #### TESTE REMOVER 
+        listUrl = []
+        for Cap in Json["sensors"]["capabilities"]:
+            listUrl.append(Cap["addr"])
+
+        #BetterUrl = latencyTest(listUrl)
 
         for Cap in Capabilities:
             msg = {
@@ -394,14 +402,14 @@ def AutoSetVirtualizer():
                 "capability_type":Cap["capability_type"],
                 "association": Cap["association"], 
             }
-            cadastrarCap(msg,BetterUrl)
+            #cadastrarCap(msg,BetterUrl)
 
         msg = {
-            "regInfos":{Sensors["resources"]
-            },
+            "regInfos": Json["sensors"]["resources"],
             "realSensors":[{"uuid":"709fd3e3-4112-46f4-b148-4778775998e7","capabilities":["temperature","pressure"]}]
         }
-        cadastrarRec(msg,BetterUrl)
+        #cadastrarRec(msg,BetterUrl)
+        return "ok"
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):

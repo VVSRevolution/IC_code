@@ -12,6 +12,32 @@ def latencyTest(list):
     print(f"\tMenor:\t{url_menor_ping}\t{menor_tempo}ms")
     return url_menor_ping
         
+def latencyPrecision(Json):
+    delay = 0
+    requests = 10
+    if "delay" in Json["rules"]["settings"]:
+        delay = Json["rules"]["settings"]["delay"]
+    if "requests" in Json["rules"]["settings"]:
+        requests = Json["rules"]["settings"]["requests"]
+    listUrl = [capability["addr"] for capability in Json["sensors"]["capabilities"]]
+    print (listUrl)
+    msg = {
+        "pinglist":listUrl,
+        "delay":delay,
+        "requests":requests
+    }
+    headers = {'Content-Type': 'application/json'}
+    for url in listUrl:
+        pinglist = [u for u in listUrl if u != url]
+        msg['pinglist'] = pinglist
+        
+        response = requests.post(url, data=json.dumps(msg), headers=headers)
+   
+
+
+    
+
+
 
 def pingUrl(url):
     tempos_resposta = []

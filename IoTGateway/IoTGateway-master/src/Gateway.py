@@ -2,7 +2,7 @@ from protocolClients import MqttClass
 from protocolClients import CoapClass
 from db import DB
 from create_db import Sensors
-import socket, threading, zmq, time
+import socket, threading, zmq, time,requests
 import psutil
 
 from flask import Flask, request, jsonify, render_template
@@ -50,7 +50,53 @@ def sensors():
         else:
             return render_template("table.html", headings=headers, data=resources)
         
+@app.route('/ping', methods=['POST'])
+def ping():
+    Json = request.get_json()
+    menorurl, menortempo = latencyTest()
+    msg = {
+        "url":menorurl,
+        "time":menortempo
+    }
 
+    return jsonify(msg) 
+    
+    pingUrl()
+        
+def latencyTest(list):
+    menor_tempo = float('inf')
+    url_menor_ping = None
+    print(f"\033[1m[MANAGER-LOW]:\033[0m\tTeste de Lantencia:")
+    for url in list:
+        media_tempo_resposta = pingUrl(url)
+        if media_tempo_resposta is not None and media_tempo_resposta < menor_tempo:
+            menor_tempo = media_tempo_resposta
+            url_menor_ping = url
+    print(f"\tMenor:\t{url_menor_ping}\t{menor_tempo}ms")
+    return (url_menor_ping, menor_tempo)
+        
+
+def pingUrl(url,delay, times):
+    tempos_resposta = []
+    print(f"\tPing \"{url}\"")
+
+    for _ in range(times):
+        try:
+            resposta = requests.get(url)
+            tempo_resposta = resposta.elapsed.total_seconds() * 1000  # Converte para milissegundos
+            tempos_resposta.append(tempo_resposta)
+            print(f"\t\t{tempo_resposta}")
+            time.sleep(delay)
+        except requests.exceptions.RequestException as e:
+            print(f"\t\tErro ao fazer requisição: {e}")
+
+    if tempos_resposta:
+        media = sum(tempos_resposta) / len(tempos_resposta)
+        print(f"\tMedia:\t{media} ms\n")
+        return media
+    else:
+        return None
+    
 def sendToDS(portF):
     
     print("\n-----------------------------------DIRECTORY SERVICE-----------------------------------\n")

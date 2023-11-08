@@ -28,7 +28,11 @@
             "lon":12
         }
     },
-    "rules":[
-        "latency"
-    ]
+    "rules":{
+        "type":"latency-precision",
+        "settings":{
+            "delay":10,
+            "requests":20
+        }
+    }
 }
