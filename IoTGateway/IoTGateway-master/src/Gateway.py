@@ -1,12 +1,15 @@
 from protocolClients import MqttClass
 from protocolClients import CoapClass
 from db import DB
+from urllib3 import HTTPConnectionPool
 from create_db import Sensors
 import socket, threading, zmq, time,requests
 import psutil
 
 from flask import Flask, request, jsonify, render_template
 from flask.wrappers import Response
+
+porttest = 443
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(('8.8.8.8', 80))
@@ -52,8 +55,12 @@ def sensors():
         
 @app.route('/ping', methods=['POST'])
 def ping():
+    
     Json = request.get_json()
-    menorurl, menortempo = latencyTest()
+
+    menorurl, menortempo = latencyTest(Json)
+    
+
     msg = {
         "url":menorurl,
         "time":menortempo
@@ -61,41 +68,85 @@ def ping():
 
     return jsonify(msg) 
     
-    pingUrl()
         
-def latencyTest(list):
+def latencyTest(Json):
     menor_tempo = float('inf')
     url_menor_ping = None
     print(f"\033[1m[MANAGER-LOW]:\033[0m\tTeste de Lantencia:")
+    threadpings = []
+    resultadopings = []
+    list = Json["pinglist"]
     for url in list:
-        media_tempo_resposta = pingUrl(url)
-        if media_tempo_resposta is not None and media_tempo_resposta < menor_tempo:
-            menor_tempo = media_tempo_resposta
-            url_menor_ping = url
+        #media_tempo_resposta = pingUrl(url, Json["delay"],Json["requests"], resultadopings)
+
+        thread = threading.Thread(target=pingUrl, args=(url, Json["delay"], Json["requests"], resultadopings))
+        threadpings.append(thread)
+        thread.start()
+    for threads in threadpings:
+        threads.join()
+
+    print(resultadopings)
+    for i in resultadopings:
+        print(resultadopings)
+        if(resultadopings[i][1] == "ERRO"):
+            #print(f"\t\tErro ao fazer requisição: {resultadopings[i][1]}")
+            menor_tempo = resultadopings[i][1]
+            url_menor_ping = "ERRO"
+        else:
+            if resultadopings[i][1] < menor_tempo:
+                menor_tempo = resultadopings[i][1]
+                url_menor_ping = resultadopings[i][0]
+    
     print(f"\tMenor:\t{url_menor_ping}\t{menor_tempo}ms")
+
     return (url_menor_ping, menor_tempo)
         
 
-def pingUrl(url,delay, times):
+def pingUrl(url, delay, times, resultadopings):
+    global porttest
     tempos_resposta = []
-    print(f"\tPing \"{url}\"")
+    port = porttest
+    print(porttest)
+    porttest = portF + 1
+    
+    connection_pool = HTTPConnectionPool(host=url, maxsize=100)
+    session = requests.Session()
+    adapter = requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100, pool_block=connection_pool)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    print(f"\tPing \"{url}:{port}\"")
+
 
     for _ in range(times):
         try:
-            resposta = requests.get(url)
-            tempo_resposta = resposta.elapsed.total_seconds() * 1000  # Converte para milissegundos
+            for _ in range(10):
+                try:
+                    resposta = session.get(f"{url}")
+                    break
+                except requests.exceptions.RequestException as e:
+                    print(f"\t\tErro ao fazer requisição para a porta {port}: {e}")
+                    port = porttest
+                    porttest = portF + 1
+            
+
+            tempo_resposta = resposta.elapsed.total_seconds() * 1000  #Converte para milissegundos
             tempos_resposta.append(tempo_resposta)
-            print(f"\t\t{tempo_resposta}")
+            print(f"\tPing \"{url}:{port}\"\t{tempo_resposta}")
             time.sleep(delay)
         except requests.exceptions.RequestException as e:
             print(f"\t\tErro ao fazer requisição: {e}")
+        finally:
+            # Fechar a sessão após cada solicitação
+            #session.close()
+            pass
+    session.close()
 
     if tempos_resposta:
         media = sum(tempos_resposta) / len(tempos_resposta)
-        print(f"\tMedia:\t{media} ms\n")
-        return media
+        print(f"\tMEDIA:\t\"{url}\"\t{media} ms\n")
+        resultadopings.append((url, media))
     else:
-        return None
+        resultadopings.append((url, "ERRO"))
     
 def sendToDS(portF):
     

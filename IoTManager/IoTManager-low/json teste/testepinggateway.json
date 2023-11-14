@@ -1,5 +1,5 @@
 {
-    "pinglist":["172.24.219.147:8001", "172.24.219.147:8002"],
-    "delay":10,
-    "requests":20
+    "pinglist":["https://www.google.com","https://www.x.com"],
+    "delay":0,
+    "requests":3
 }
