@@ -86,16 +86,18 @@ def latencyTest(Json):
         threads.join()
 
     print(resultadopings)
-    for i in resultadopings:
+    for result in resultadopings:
         print(resultadopings)
-        if(resultadopings[i][1] == "ERRO"):
-            #print(f"\t\tErro ao fazer requisição: {resultadopings[i][1]}")
-            menor_tempo = resultadopings[i][1]
+        print("ERRRRRRRRRO ")
+        print(result[1])
+        if(result[1] == "ERRO"):
+            #print(f"\t\tErro ao fazer requisição: {result[1]}")
+            menor_tempo = result[1]
             url_menor_ping = "ERRO"
         else:
-            if resultadopings[i][1] < menor_tempo:
-                menor_tempo = resultadopings[i][1]
-                url_menor_ping = resultadopings[i][0]
+            if result[1] < menor_tempo:
+                menor_tempo = result[1]
+                url_menor_ping = result[0]
     
     print(f"\tMenor:\t{url_menor_ping}\t{menor_tempo}ms")
 
