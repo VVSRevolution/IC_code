@@ -58,15 +58,11 @@ def ping():
     
     Json = request.get_json()
 
-    menorurl, menortempo = latencyTest(Json)
-    
+    resuntado = latencyTest(Json)
+    resultados_json = [{"url": url, "latency": latency} for url, latency in resuntado]
+    print(resultados_json)
 
-    msg = {
-        "url":menorurl,
-        "time":menortempo
-    }
-
-    return jsonify(msg) 
+    return jsonify(resultados_json) 
     
         
 def latencyTest(Json):
@@ -84,12 +80,10 @@ def latencyTest(Json):
         thread.start()
     for threads in threadpings:
         threads.join()
-
+    resultadopings = sorted(resultadopings, key=lambda x: x[1])
     print(resultadopings)
     for result in resultadopings:
-        print(resultadopings)
-        print("ERRRRRRRRRO ")
-        print(result[1])
+        #print(resultadopings)
         if(result[1] == "ERRO"):
             #print(f"\t\tErro ao fazer requisição: {result[1]}")
             menor_tempo = result[1]
@@ -101,8 +95,10 @@ def latencyTest(Json):
     
     print(f"\tMenor:\t{url_menor_ping}\t{menor_tempo}ms")
 
-    return (url_menor_ping, menor_tempo)
+    return (resultadopings)
         
+
+lock = threading.Lock()
 
 def pingUrl(url, delay, times, resultadopings):
     global porttest
@@ -110,7 +106,7 @@ def pingUrl(url, delay, times, resultadopings):
     port = porttest
     print(porttest)
     porttest = portF + 1
-    
+
     connection_pool = HTTPConnectionPool(host=url, maxsize=100)
     session = requests.Session()
     adapter = requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100, pool_block=connection_pool)
@@ -118,20 +114,19 @@ def pingUrl(url, delay, times, resultadopings):
     session.mount('https://', adapter)
     print(f"\tPing \"{url}:{port}\"")
 
-
     for _ in range(times):
         try:
-            for _ in range(10):
+            for _ in range(3):
                 try:
-                    resposta = session.get(f"{url}")
+                    with lock:
+                        resposta = session.get(f"{url}")
                     break
                 except requests.exceptions.RequestException as e:
                     print(f"\t\tErro ao fazer requisição para a porta {port}: {e}")
                     port = porttest
                     porttest = portF + 1
-            
 
-            tempo_resposta = resposta.elapsed.total_seconds() * 1000  #Converte para milissegundos
+            tempo_resposta = resposta.elapsed.total_seconds() * 1000  # Converte para milissegundos
             tempos_resposta.append(tempo_resposta)
             print(f"\tPing \"{url}:{port}\"\t{tempo_resposta}")
             time.sleep(delay)
@@ -139,7 +134,7 @@ def pingUrl(url, delay, times, resultadopings):
             print(f"\t\tErro ao fazer requisição: {e}")
         finally:
             # Fechar a sessão após cada solicitação
-            #session.close()
+            # session.close()
             pass
     session.close()
 

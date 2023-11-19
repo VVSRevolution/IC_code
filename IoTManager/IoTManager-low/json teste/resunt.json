@@ -1,0 +1,38 @@
+[
+  {
+    "latency": 35.0804, 
+    "url": "https://www.gov.br/"
+  }, 
+  {
+    "latency": 46.6304, 
+    "url": "https://sigaa.sistemas.ufg.br/"
+  }, 
+  {
+    "latency": 76.3486, 
+    "url": "https://github.com/"
+  }, 
+  {
+    "latency": 140.8114, 
+    "url": "https://www.rapidtables.com"
+  }, 
+  {
+    "latency": 187.2502, 
+    "url": "https://www.google.com"
+  }, 
+  {
+    "latency": 233.47060000000002, 
+    "url": "https://chat.openai.com/"
+  }, 
+  {
+    "latency": 374.51460000000003, 
+    "url": "https://www.x.com"
+  }, 
+  {
+    "latency": 423.97080000000005, 
+    "url": "https://www.netflix.com/"
+  }, 
+  {
+    "latency": 1325.1457999999998, 
+    "url": "https://ufg.br/"
+  }
+]
