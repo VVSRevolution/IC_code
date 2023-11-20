@@ -27,15 +27,27 @@ def latencyPrecision(Json):
         "requests":requests
     }
     headers = {'Content-Type': 'application/json'}
+    sums_by_url = {}
     for url in listUrl:
         pinglist = [u for u in listUrl if u != url]
         msg['pinglist'] = pinglist
         
         response = requests.post(url, data=json.dumps(msg), headers=headers)
    
+        if response.status_code == 200:
+            data = response.json()
 
+            response_url = data.get('url')
+            latency = data.get('latency')
 
-    
+            if response_url not in sums_by_url:
+                sums_by_url[response_url] = 0
+
+            sums_by_url[response_url] += latency
+            
+    min_sum_url = min(sums_by_url, key=sums_by_url.get)
+
+    return min_sum_url        
 
 
 
