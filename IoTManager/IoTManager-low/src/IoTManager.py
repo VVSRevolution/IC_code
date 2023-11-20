@@ -383,7 +383,7 @@ def AutoSetVirtualizer():
         Sensors = Json["sensors"]
         Capabilities = Sensors["capabilities"]
         print(Json)
-
+        
         if Json["rules"]["type"] == "latency-precision":
             latencyPrecision(Json)
         

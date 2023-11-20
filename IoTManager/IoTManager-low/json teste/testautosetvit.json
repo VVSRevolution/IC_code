@@ -5,14 +5,14 @@
                 "name":"averagePressure",
                 "description":"Teste",
                 "address":"A/B",
-                "addr":"172.24.219.147:9000",
+                "addr":"http://172.24.219.147:8000",
                 "capability_type":"sensor",
                 "association": "$average:pressure" 
             },{
                 "name":"averageTemperature",
                 "description":"Teste",
-                "address":"A/B",
-                "addr":"172.24.219.147:9000",
+                "address":"A/C",
+                "addr":"http://172.24.219.147:8001",
                 "capability_type":"sensor",
                 "association": "$average:temperature" 
             }
@@ -31,8 +31,8 @@
     "rules":{
         "type":"latency-precision",
         "settings":{
-            "delay":10,
-            "requests":20
+            "delay":1,
+            "requests":3
         }
     }
 }

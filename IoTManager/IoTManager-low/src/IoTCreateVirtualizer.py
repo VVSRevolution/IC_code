@@ -1,4 +1,4 @@
-import socket, requests, json
+import socket, requests, json, traceback
 
 def latencyTest(list):
     menor_tempo = float('inf')
@@ -13,41 +13,64 @@ def latencyTest(list):
     return url_menor_ping
         
 def latencyPrecision(Json):
-    delay = 0
-    requests = 10
+    delay = 1
+    num_requests = 10
+    
     if "delay" in Json["rules"]["settings"]:
         delay = Json["rules"]["settings"]["delay"]
     if "requests" in Json["rules"]["settings"]:
-        requests = Json["rules"]["settings"]["requests"]
+        num_requests = Json["rules"]["settings"]["requests"]
+    
     listUrl = [capability["addr"] for capability in Json["sensors"]["capabilities"]]
-    print (listUrl)
+    print(listUrl)
+
     msg = {
-        "pinglist":listUrl,
-        "delay":delay,
-        "requests":requests
+        "pinglist": listUrl,
+        "delay": delay,
+        "requests": num_requests
     }
+    print(f"\033[1m[CreateVirtualizer]:\033[0m\t\tLISTURL:\n\t\t{listUrl}\n")
     headers = {'Content-Type': 'application/json'}
     sums_by_url = {}
+
     for url in listUrl:
         pinglist = [u for u in listUrl if u != url]
         msg['pinglist'] = pinglist
+
         
-        response = requests.post(url, data=json.dumps(msg), headers=headers)
-   
-        if response.status_code == 200:
-            data = response.json()
 
-            response_url = data.get('url')
-            latency = data.get('latency')
+        try:
+            print(f"\033[1m[CreateVirtualizer]:\033[0m\t\t{url}/ping:")
+            print(f"\033[1m[CreateVirtualizer]:\033[0m\t\tPINGLIST:\n\t\t{pinglist}\n")
+            response = requests.post(f"{url}/ping", data=json.dumps(msg), headers=headers)
+            print(f"\033[1m[CreateVirtualizer]:\033[0m\t\t{url}/ping RETURN:")
+            print(response.json())
 
-            if response_url not in sums_by_url:
-                sums_by_url[response_url] = 0
+            if response.status_code == 200:
+                data = response.json()
+                for response_data in data:
+                    response_url = response_data.get('url')
+                    latency = response_data.get('latency')
 
-            sums_by_url[response_url] += latency
-            
-    min_sum_url = min(sums_by_url, key=sums_by_url.get)
+                if response_url not in sums_by_url:
+                    sums_by_url[response_url] = {"sum": 0, "address": Json["sensors"]["capabilities"][listUrl.index(response_url)]["address"]}
 
-    return min_sum_url        
+                sums_by_url[response_url]["sum"] += latency
+
+            else:
+                print(f"Request to {url} failed with status code {response.status_code}")
+
+        except Exception as e:
+            print(f"Error processing {url}: {e}")
+            traceback.print_exc()
+
+    if sums_by_url:
+        min_sum_url = min(sums_by_url, key=lambda x: sums_by_url[x]["sum"])
+        returne = sums_by_url[min_sum_url]["address"]
+        print(f"\033[1m[CreateVirtualizer]:\033[0m\t\tBest address is: \"{returne}\"")
+        return sums_by_url[min_sum_url]["address"]
+    else:
+        return None     
 
 
 

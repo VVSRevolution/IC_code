@@ -57,12 +57,15 @@ def sensors():
 def ping():
     
     Json = request.get_json()
-
+    print(f"\033[1m[GATEWAY - ping]:\033[0m\t\trequest\n{Json}")
     resuntado = latencyTest(Json)
+    print(f"resuntado = {resuntado}")
     resultados_json = [{"url": url, "latency": latency} for url, latency in resuntado]
     print(resultados_json)
 
-    return jsonify(resultados_json) 
+    returne = jsonify(resultados_json) 
+    print(returne)
+    return returne 
     
         
 def latencyTest(Json):
@@ -78,8 +81,10 @@ def latencyTest(Json):
         thread = threading.Thread(target=pingUrl, args=(url, Json["delay"], Json["requests"], resultadopings))
         threadpings.append(thread)
         thread.start()
+
     for threads in threadpings:
         threads.join()
+
     resultadopings = sorted(resultadopings, key=lambda x: x[1])
     print(resultadopings)
     for result in resultadopings:
@@ -95,7 +100,7 @@ def latencyTest(Json):
     
     print(f"\tMenor:\t{url_menor_ping}\t{menor_tempo}ms")
 
-    return (resultadopings)
+    return resultadopings
         
 
 lock = threading.Lock()
@@ -167,7 +172,8 @@ if __name__ == "__main__":
     coapGateway = CoapClass()
 
     hostF = "0.0.0.0"
-    portF = 8000
+    portF = 8001
+
 
     #mqttGateway.startListening("ctuqpqym","Xk5GNcWqcmZG")
     #sthread_coap_server = coapGateway.startListening()
