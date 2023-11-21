@@ -1,10 +1,10 @@
 # Deploy InterScity
 
-Install kubectl
+- Install kubectl
 
-Install e start minikube
+- Install e start minikube
 
-https://minikube.sigs.k8s.io/docs/start/
+    - https://minikube.sigs.k8s.io/docs/start/
 
 1 - Criar namespace
 
@@ -67,7 +67,9 @@ https://minikube.sigs.k8s.io/docs/start/
 
     kubectl get svc -n interscity
 
-11 - minikube -n interscity service kong-service --url
+11 - 
+
+    minikube -n interscity service kong-service --url
 
 - Irá gerar duas url para o Kong
 
