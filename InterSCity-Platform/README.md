@@ -81,7 +81,11 @@
     curl http://{url}/collector/resources/data
 
 
-13 - Demais comandos (não precisa executar)
+13 - exportar 
+
+    kubectl -n interscity port-forward service/kong-service --address 0.0.0.0 8080:8001
+
+ - Demais comandos (não precisa executar)
 :
 
     eval $(minikube docker-env)
