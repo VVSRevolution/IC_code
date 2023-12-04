@@ -376,7 +376,7 @@ def search():
 @IoTmaganer.route('/AutoSetVirtualizer',methods =['POST'])
 def AutoSetVirtualizer():
     if request.method == 'POST':  
-        #curl -X POST -H "Content-Type: application/json" -d @testautosetvit.json http://172.24.219.147:9000/AutoSetVirtualizer
+        #curl -X POST -H "Content-Type: application/json" -d @autoSetVit2.json http://172.27.9.88:9000/AutoSetVirtualizer
 
 
         Json = request.get_json()
@@ -385,7 +385,11 @@ def AutoSetVirtualizer():
         print(Json)
         
         if Json["rules"]["type"] == "latency-precision":
-            latencyPrecision(Json)
+            address = latencyPrecision(Json)
+
+        if Json["rules"]["type"] == "latency-approximate":
+            address = latencyApproximate(Json)
+        
         
 
         #### TESTE REMOVER 

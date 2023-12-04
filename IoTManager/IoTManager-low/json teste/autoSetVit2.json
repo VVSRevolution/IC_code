@@ -4,25 +4,18 @@
             {
                 "name":"averagePressure",
                 "description":"Teste",
-                "address":"A/B",
-                "addr":"http://172.17.77.141:8001",
+                "address":"A/B/D",
+                "addr":"http://172.24.219.147:8000",
                 "capability_type":"sensor",
                 "association": "$average:pressure" 
             },{
                 "name":"averageTemperature",
                 "description":"Teste",
-                "address":"A/C",
-                "addr":"http://172.17.77.141:8002",
+                "address":"A/B/C",
+                "addr":"http://172.24.219.147:8001",
                 "capability_type":"sensor",
                 "association": "$average:temperature" 
-                },{
-                    "name":"averageTemperature",
-                    "description":"Teste",
-                    "address":"A/D",
-                    "addr":"http://172.17.77.141:8003",
-                    "capability_type":"sensor",
-                    "association": "$average:temperature" 
-                }
+            }
         ],
         "resources":{
             "description": "Test9/7/22",
@@ -36,7 +29,7 @@
         }
     },
     "rules":{
-        "type":"latency-precision",
+        "type":"latency-approximate",
         "settings":{
             "delay":1,
             "requests":3

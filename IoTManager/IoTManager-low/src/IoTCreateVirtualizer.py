@@ -29,7 +29,7 @@ def latencyPrecision(Json):
         "delay": delay,
         "requests": num_requests
     }
-    print(f"\033[1m[CreateVirtualizer]:\033[0m\t\tLISTURL:\n\t\t{listUrl}\n")
+    print(f"\033[1m[IoTCreateVirtualizer]:\033[0m\t\tLISTURL:\n\t\t{listUrl}\n")
     headers = {'Content-Type': 'application/json'}
     sums_by_url = {}
 
@@ -37,25 +37,24 @@ def latencyPrecision(Json):
         pinglist = [u for u in listUrl if u != url]
         msg['pinglist'] = pinglist
 
-        
-
         try:
-            print(f"\033[1m[CreateVirtualizer]:\033[0m\t\t{url}/ping:")
-            print(f"\033[1m[CreateVirtualizer]:\033[0m\t\tPINGLIST:\n\t\t{pinglist}\n")
-            response = requests.post(f"{url}/ping", data=json.dumps(msg), headers=headers)
-            print(f"\033[1m[CreateVirtualizer]:\033[0m\t\t{url}/ping RETURN:")
-            print(response.json())
+            print(f"\033[1m[IoTCreateVirtualizer]:\033[0m\t\t{url}/ping:")
+            print(f"\033[1m[IoTCreateVirtualizer]:\033[0m\t\tPINGLIST:\n\t\t\t\t{pinglist}\n")
 
+            response = requests.post(f"{url}/ping", data=json.dumps(msg), headers=headers)
+
+            print(f"\033[1m[IoTCreateVirtualizer]:\033[0m\t\t{url}/ping RETURN:\n\t\t\t\t{response.json()}\n")
+ 
             if response.status_code == 200:
                 data = response.json()
                 for response_data in data:
                     response_url = response_data.get('url')
                     latency = response_data.get('latency')
 
-                if response_url not in sums_by_url:
-                    sums_by_url[response_url] = {"sum": 0, "address": Json["sensors"]["capabilities"][listUrl.index(response_url)]["address"]}
-
-                sums_by_url[response_url]["sum"] += latency
+                    if response_url not in sums_by_url:
+                        sums_by_url[response_url] = {"sum": 0, "address": Json["sensors"]["capabilities"][listUrl.index(response_url)]["address"]}
+                    
+                    sums_by_url[response_url]["sum"] += latency
 
             else:
                 print(f"Request to {url} failed with status code {response.status_code}")
@@ -63,15 +62,44 @@ def latencyPrecision(Json):
         except Exception as e:
             print(f"Error processing {url}: {e}")
             traceback.print_exc()
-
+    #print(sums_by_url)
     if sums_by_url:
         min_sum_url = min(sums_by_url, key=lambda x: sums_by_url[x]["sum"])
         returne = sums_by_url[min_sum_url]["address"]
-        print(f"\033[1m[CreateVirtualizer]:\033[0m\t\tBest address is: \"{returne}\"")
+        print(f"\033[1m[IoTCreateVirtualizer]:\033[0m\t\tBest address is: \"{returne}\"\n")
         return sums_by_url[min_sum_url]["address"]
     else:
         return None     
 
+def latencyApproximate(Json):
+    enderecos = []
+    dic_pings = {}
+    for Cap in Json["sensors"]["capabilities"]:
+        enderecos.append(Cap["address"])
+
+    listas_enderecos = [endereco.split("/") for endereco in enderecos]
+
+    menor_comprimento = min(len(lista) for lista in listas_enderecos)
+
+    pais_comuns = []
+
+    for i in range(menor_comprimento):
+        if all(lista[i] == listas_enderecos[0][i] for lista in listas_enderecos):
+            pais_comuns.append(listas_enderecos[0][i])
+        else:
+            break
+
+        print(f"Os pais comuns são: {pais_comuns}")
+
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(f"{url}/ping", data=json.dumps(msg), headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        for response_data in data:
+            response_url = response_data.get('url')
+            latency = response_data.get('latency')
+        if response_url not in dic_pings:
+            pass
 
 
 def pingUrl(url):
@@ -93,7 +121,6 @@ def pingUrl(url):
         return media
     else:
         return None
-
 
 def cadastrarCap(msg,url):
     headers= {'Content-type': 'application/json',}
