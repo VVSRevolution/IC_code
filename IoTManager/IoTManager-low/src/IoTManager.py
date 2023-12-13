@@ -415,6 +415,33 @@ def AutoSetVirtualizer():
         #cadastrarRec(msg,BetterUrl)
         return "ok"
 
+@IoTmaganer.route('/pingParent',methods =['POST'])
+def pingParent():
+
+    Json = request.get_json()
+    print(f"\033[1m[MANAGER_LOW - ping]:\033[0m\t\trequest\n{Json}\n\n")
+    resuntado = latencyTest(Json)
+
+    try:
+        query = ManagerFather.get(
+                    (ManagerFather.id == 1)
+        )
+    except ManagerFather.DoesNotExist:
+        return None
+    else:
+        url = f"http://{query.ip}:{query.port}"
+        print(f"\033[1m[MANAGER_LOW - ping]:\033[0m\t\tPing: {url}")
+        latency = pingUrl(url, Json["delay"], Json["requests"])
+
+        addr_tree = treeAddress.get(
+                    (treeAddress.id == 1)
+        )
+        msg = {
+                "latency": latency,
+                "parent_url": url,
+                "tree_addr": addr_tree.parent
+            }
+
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
