@@ -95,3 +95,22 @@
     kubectl delete -R -f .
 
     kubectl get pods -n interscity --watch
+   
+### FIX problema de ImagePullBackOff
+
+1 - descubra o nome do profile e entre nele
+
+    minikube profile list 
+    minikube ssh -p <profilename>
+
+2 - Dentro do ambiente logar e baixar as imagens
+
+    docker login registry.lsdi.ufma.br
+
+    aluno
+
+    public@c@o
+
+    docker pull registry.lsdi.ufma.br/interscity/data-collector:fix-1
+
+    docker pull registry.lsdi.ufma.br/interscity/resource-discovery:0.0.2
